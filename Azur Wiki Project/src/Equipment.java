@@ -23,6 +23,4 @@ public class Equipment {
 		this.equipment_name = equipment_name;
 	}
 	
-	
-	
 }
