@@ -1,4 +1,11 @@
+import java.awt.Image;
+import java.net.URL;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class Ship {
 
@@ -97,6 +104,24 @@ public class Ship {
 		
 	}
 
+	public JPanel loadImage(String url) throws Exception{
+		
+		JPanel image_panel = new JPanel();
+		
+		Image img = ImageIO.read(new URL(url));
+		
+		int width = (int)(img.getWidth(null) * 0.5);
+		int height = (int)(img.getHeight(null) * 0.5);
+		
+		JLabel img_container = new JLabel(new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+		
+		image_panel.add(img_container);
+		System.out.println(width);
+		
+		return image_panel;
+		
+	}
+	
 	//Getter & Setter For Each Attribute (Just Ignore)
 	
 	public List<String> getImageLink() {
