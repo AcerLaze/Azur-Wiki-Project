@@ -86,7 +86,7 @@ public class WebAdapter {
 						"https://azurlane.koumakan.jp" + link, ShipContainer.NORMAL_SHIP);
 			
 			shipList.addShip(ShipContainer.NORMAL_SHIP, ship);
-			System.out.println(ShipData.get(1).text() + " data downloaded!");
+			//System.out.println(ShipData.get(1).text() + " data downloaded!");
 			
 		}
 		
@@ -107,7 +107,7 @@ public class WebAdapter {
 								  						  ShipData.get(3).text(),
 								  						  ShipData.get(4).text(),
 								  						  "https://azurlane.koumakan.jp" + link, ShipContainer.PRIORITY_SHIP));
-			System.out.println(ShipData.get(1).text() + " data downloaded!");
+			//System.out.println(ShipData.get(1).text() + " data downloaded!");
 		}
 		
 		System.out.println("Priority Ship Download Success");
@@ -127,7 +127,7 @@ public class WebAdapter {
 								  			    		ShipData.get(3).text(),
 								  					    ShipData.get(4).text(),
 								  			    		"https://azurlane.koumakan.jp" + link, ShipContainer.COLLAB_SHIP));
-			System.out.println(ShipData.get(1).text() + " data downloaded!");
+			//System.out.println(ShipData.get(1).text() + " data downloaded!");
 		}
 		
 		System.out.println("Collab Ship Download Success");
