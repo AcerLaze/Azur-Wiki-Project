@@ -1,11 +1,18 @@
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class Ship {
 
@@ -51,10 +58,14 @@ public class Ship {
 	private boolean retrofitable;
 	private boolean downloaded = false;
 	
-	List<Skill> skills;
-	List<Equipment> equipments;
-	List<String> imageLink;
+	private List<Skill> skills;
+	private List<Equipment> equipments;
+	private List<Image> image;
+	private Image icon;
+	private JLabel img_container;
 
+	private int index = 0;
+	
 	public Ship() {
 		
 		firepower = health = anti_air = evasion = aviation = torpedo = reload = luck = oil_consumtion = accuracy = speed = anti_submarine_warfare = 0;
@@ -88,7 +99,51 @@ public class Ship {
 			construction_time = web_adapter.requestConstructionTime();
 			ship_class = web_adapter.requestClass();
 			
-			imageLink = web_adapter.getImage();
+			image = new ArrayList<Image>();
+			
+			for (String url : web_adapter.getImage()) {
+			
+				Image img = null;
+				
+				String directory = "Source/" + name + "/";
+				
+				try {
+					
+					String[] temp = url.split("/");
+					
+					directory += temp[temp.length - 1];
+					
+					System.out.println(" > Looking picture at" + directory);
+					
+					img = ImageIO.read(new File(directory));
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+					System.out.println(" > Failed to find picture fetching from internet");
+					try {
+						
+						//System.out.println(url);
+						
+						img = ImageIO.read(new URL(url));
+						
+						new File("Source/" + name + "/").mkdirs();
+						
+						ImageIO.write((BufferedImage)img, "png", new File(directory));
+						
+					} catch (Exception ee) {
+						// TODO Auto-generated catch block
+						
+						System.out.println(" > " + name + " failed to fetch image.");
+						
+					}
+					
+				}
+				
+				int width = (int)(img.getWidth(null) * 0.5);
+				int height = (int)(img.getHeight(null) * 0.5);
+				image.add(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+				
+			};
 		
 			web_adapter.getShipStat(this);
 		
@@ -104,32 +159,74 @@ public class Ship {
 		
 	}
 
-	public JPanel loadImage(String url) throws Exception{
+	public JPanel loadImage(int index) throws Exception{
 		
 		JPanel image_panel = new JPanel();
 		
-		Image img = ImageIO.read(new URL(url));
+		img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
 		
-		int width = (int)(img.getWidth(null) * 0.5);
-		int height = (int)(img.getHeight(null) * 0.5);
+		int width = image.get(index).getWidth(null) / 2;
+		int height = image.get(index).getHeight(null) / 2;
 		
-		JLabel img_container = new JLabel(new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+		width = (337 / 2) - (width);
+		height = (512 / 2) - (height);
 		
 		image_panel.add(img_container);
-		System.out.println(width);
+		image_panel.setPreferredSize(new Dimension(337, 512));
+		
+		image_panel.setBorder(new EmptyBorder(height, width, 0, 0));
+	
+		image_panel.setBackground(Color.white);
 		
 		return image_panel;
 		
 	}
 	
+	public void nextImage() {
+		
+		index++;
+		if(index >= image.size()) index = 0;
+		System.out.println(index);
+		
+		try {
+			
+			img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+
+		
+	}
+	
+	public void prevImage() {
+		
+		index--;
+		if(index < 0) index = image.size() - 1;
+		System.out.println(index);
+		
+		try {
+			
+			img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
 	//Getter & Setter For Each Attribute (Just Ignore)
 	
-	public List<String> getImageLink() {
-		return imageLink;
+	public List<Image> getImageLink() {
+		return image;
 	}
 
-	public void setImageLink(List<String> imageLink) {
-		this.imageLink = imageLink;
+	public void setImageLink(List<Image> image) {
+		this.image = image;
 	}
 
 	public String getId() {
