@@ -81,7 +81,14 @@ public class WindowsManager {
 		panel.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10))); //UP LEFT DOWN RIGHT
 		try {
 			
-			panel.add(ship.loadImage(0));
+			JPanel img_container = new JPanel();
+			
+			img_container.setPreferredSize(new Dimension(337, 512));
+			img_container = ship.loadImage(0);
+			
+			//img_container.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+			
+			panel.add(img_container);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

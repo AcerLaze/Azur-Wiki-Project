@@ -176,7 +176,34 @@ public class Ship {
 		
 		image_panel.setBorder(new EmptyBorder(height, width, 0, 0));
 	
-		image_panel.setBackground(Color.white);
+		Color background;
+		
+		switch (rarity) {
+		case "Unreleased":
+		case "Normal":
+		default:
+			background = new Color(220, 220, 220, 180);
+			
+			break;
+			
+		case "Rare":
+			
+			background = new Color(176, 224, 230, 180);
+			
+			break;
+			
+		case "Elite":
+			
+			background = new Color(221, 160, 221, 180);
+			
+			break;
+			
+		case "Super Rare":
+			
+			background = new Color(255, 232, 170, 180);
+		}
+		
+		image_panel.setBackground(background);
 		
 		return image_panel;
 		

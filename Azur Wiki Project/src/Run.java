@@ -5,7 +5,7 @@ import javax.swing.SwingUtilities;
 
 public class Run {
 
-	private int system_mod = 1;
+	private int system_mod = 0;
 	private boolean console_mode = true;
 	
 	Run(){
@@ -284,8 +284,11 @@ public class Run {
 		for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
 			
 			//if(ship.getName().contentEquals("San Diego")) { ship.getData(); run_windows(ship);}
-			//if(ship.getName().contentEquals("Jean Bart")) { ship.getData(); run_windows(ship);}
-			if(ship.getName().contentEquals("Enterprise")) { ship.getData(); run_windows(ship);}
+			if(ship.getName().contentEquals("Jean Bart")) { ship.getData(); run_windows(ship);}
+			//if(ship.getName().contentEquals("Enterprise")) { ship.getData(); run_windows(ship);}
+			if(ship.getName().contentEquals("Ayanami")) { ship.getData(); run_windows(ship);}
+			if(ship.getName().contentEquals("Bogue")) { ship.getData(); run_windows(ship);}
+			if(ship.getName().contentEquals("Long Island")) { ship.getData(); run_windows(ship);}
 			
 		}
 		
