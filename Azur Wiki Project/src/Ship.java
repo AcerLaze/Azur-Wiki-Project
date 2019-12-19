@@ -86,12 +86,52 @@ public class Ship {
 	
 	public void getData() {
 		
-		WebAdapter web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
+		WebAdapter web_adapter;
+		
+		try {
+			
+			web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			
+			return;
+			
+		}
+		
 		
 		if(!rarity.contentEquals("Unreleased")) {
 			//If the ship is unrelease, dont bother to fetch more data or it will cause error
 			retrofitable = web_adapter.requestIsShipRetrofitable();
-		
+			
+			String directory = "Source/" + name + "/icon.png";
+			try {
+
+				System.out.println(" > Fetching icon from " + directory);
+				icon = ImageIO.read(new File(directory));
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println(" > Failed to load image from " + directory);
+				System.out.println(" > Downloading from wiki ...");
+				
+				try {
+					
+					icon = web_adapter.getIcon(name);
+					
+					new File("Source/" + name + "/").mkdirs();
+					
+					ImageIO.write((BufferedImage)icon, "png", new File(directory));
+					
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					System.out.println(" > Failed to download image from the wiki");
+					icon = null;
+					
+				}
+				
+			}
+			
 			skills = web_adapter.requestShipSkill();
 			equipments = web_adapter.requestShipEquipment();
 			construction_time = web_adapter.requestConstructionTime();
@@ -103,7 +143,7 @@ public class Ship {
 			
 				Image img = null;
 				
-				String directory = "Source/" + name + "/";
+				directory = "Source/" + name + "/";
 				
 				try {
 					
@@ -111,13 +151,14 @@ public class Ship {
 					
 					directory += temp[temp.length - 1];
 					
-					System.out.println(" > Looking picture at" + directory);
+					System.out.println(" > Fetching picture from " + directory);
 					
 					img = ImageIO.read(new File(directory));
 					
 				} catch (Exception e) {
 					// TODO: handle exception
-					System.out.println(" > Failed to find picture fetching from internet");
+					System.out.println(" > Failed to load picture from " + directory);
+					System.out.println(" > Downloading from the wiki...");
 					try {
 						
 						//System.out.println(url);
@@ -131,7 +172,7 @@ public class Ship {
 					} catch (Exception ee) {
 						// TODO Auto-generated catch block
 						
-						System.out.println(" > " + name + " failed to fetch image.");
+						System.out.println(" > Failed to download image from " + url);
 						
 					}
 					
@@ -143,9 +184,9 @@ public class Ship {
 				
 			};
 			
-			setDownloaded(true);
-		
 			web_adapter.getShipStat(this);
+			
+			setDownloaded(true);
 		
 		} else {
 			
@@ -173,43 +214,22 @@ public class Ship {
 		
 		image_panel.add(img_container);
 		image_panel.setPreferredSize(new Dimension(337, 512));
-		
 		image_panel.setBorder(new EmptyBorder(height, width, 0, 0));
-	
-		Color background;
-		
-		switch (rarity) {
-		case "Unreleased":
-		case "Normal":
-		default:
-			background = new Color(220, 220, 220, 180);
-			
-			break;
-			
-		case "Rare":
-			
-			background = new Color(176, 224, 230, 180);
-			
-			break;
-			
-		case "Elite":
-			
-			background = new Color(221, 160, 221, 180);
-			
-			break;
-			
-		case "Super Rare":
-		case "Priority":
-			background = new Color(255, 232, 170, 180);
-			
-			break;
-			
-			
-		}
-		
-		image_panel.setBackground(background);
+		image_panel.setBackground(getRarityColor());
 		
 		return image_panel;
+		
+	}
+	
+	public JPanel loadIcon() {
+		
+		JPanel panel = new JPanel();
+		
+		JLabel icon = new JLabel(new ImageIcon(this.icon));
+		
+		panel.add(icon);
+		
+		return panel;
 		
 	}
 	
@@ -217,7 +237,6 @@ public class Ship {
 		
 		index++;
 		if(index >= image.size()) index = 0;
-		System.out.println(index);
 		
 		try {
 			
@@ -236,7 +255,6 @@ public class Ship {
 		
 		index--;
 		if(index < 0) index = image.size() - 1;
-		System.out.println(index);
 		
 		try {
 			
@@ -247,6 +265,171 @@ public class Ship {
 			e.printStackTrace();
 			
 		}
+		
+	}
+	
+	public Color getFactionColor() {
+		
+		Color background;
+		
+		switch (faction) {
+		case "Eagle Union":
+			
+			background = new Color(176, 224, 230);
+			
+			break;
+			
+		case "Eastern Radiance":
+			
+			background = new Color(221, 160, 221);
+			
+			break;
+			
+		case "Iris Libre":
+			
+			background = new Color(255, 215, 0);
+			
+			break;
+			
+		case "Ironblood":
+			
+			background = new Color(255, 192, 203);
+			
+			break;
+			
+		case "Royal Navy":
+			
+			background = new Color(131, 170, 240);
+			
+			break;
+			
+		case "Sakura Empire":
+			
+			background = new Color(255, 240, 245);
+			
+			break;
+			
+		case "Sardegna Empire":
+			
+			background = new Color(110, 190, 147);
+			
+			break;
+			
+		case "Vichya Dominion":
+			
+			background = new Color(215, 124, 124);
+			
+			break;
+		default:
+			background = new Color(220, 220, 220);	
+
+		}
+		
+		return background;
+		
+	}
+	
+	public Color getRarityColor() {
+
+		Color background;
+		
+		switch (rarity) {
+		case "Unreleased":
+		case "Normal":
+			background = new Color(220, 220, 220);
+			
+			break;
+			
+		case "Rare":
+			
+			background = new Color(176, 224, 230);
+			
+			break;
+			
+		case "Elite":
+			
+			background = new Color(221, 160, 221);
+			
+			break;
+			
+		case "Super Rare":
+		case "Priority":
+			background = new Color(238, 232, 170);
+			
+			break;
+			
+		default:
+			background = new Color(255, 255, 255);
+
+		}
+		
+		return background;
+		
+	}
+	
+	public Color getTypeColor() {
+		
+		Color background;
+		
+		switch(type) {
+		
+		case "Destroyer":
+			
+			background = new Color(176, 224, 230);
+			
+			break;
+			
+		case "Light Cruiser":
+		case "Heavy Cruiser":
+			background = new Color(255, 222, 173);
+			
+			break;
+			
+		case "Large Cruiser":
+			
+			background = new Color(255, 160, 122);
+			
+			break;
+			
+		case "Monitor":
+			
+			background = new Color(255, 222, 173);
+			
+			break;
+			
+		case "Battleship":
+		case "Battlecruiser":
+		case "Aviation Battleship":
+			background = new Color(255, 192, 203);
+			
+			break;
+			
+		case "Aircraft Carrier":
+		case "Light Aircraft Carrier":
+			
+			background = new Color(221, 160, 221);
+			
+			break;
+			
+		case "Submarine":	
+		case "Submarine Carrier":
+			background = new Color(102, 255, 153);
+			
+			break;
+			
+		case "Repair Ship":
+			
+			background = new Color(127, 255, 212);
+			
+			break;
+			
+		default:
+			
+			background = new Color(255,255,255);
+		
+		}
+		
+		return background;
 		
 	}
 	

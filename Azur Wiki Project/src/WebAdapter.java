@@ -1,6 +1,10 @@
 
+import java.awt.Image;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -21,34 +25,23 @@ public class WebAdapter {
 	final static public int SHIP_DETAIL = 1;
 	
 	
-	WebAdapter(String url, int type){
+	WebAdapter(String url, int type) throws Exception{
 		
 		mod = 0;
 		
 		Connection connection = Jsoup.connect(url);
 		
-		try {
+
+		connection.timeout(12000);
 			
-			//System.out.println("Connecting to the server");
+		Ship_Page = Jsoup.connect(url).timeout(12000).get();
 			
-			connection.timeout(12000);
-			
-			Ship_Page = Jsoup.connect(url).timeout(12000).get();
-			
-			if(type == SHIP_LIST) Ship_List = Ship_Page.select("table.wikitable.sortable.jquery-tablesorter");
-			else if(type == SHIP_DETAIL) {
+		if(type == SHIP_LIST) Ship_List = Ship_Page.select("table.wikitable.sortable.jquery-tablesorter");
+		else if(type == SHIP_DETAIL) {
 				
-				Ship_Details = Ship_Page.select("table.wikitable");
-				Ship_Image = Ship_Page.select("div.adaptiveratioimg");
+			Ship_Details = Ship_Page.select("table.wikitable");
+			Ship_Image = Ship_Page.select("div.adaptiveratioimg");
 				
-			}
-			
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("Something Went Wrong When Connecting To The Server. Perhaps the server is down or your connection.");
-			Ship_Page = null;
-			
 		}
 		
 	}
@@ -142,49 +135,35 @@ public class WebAdapter {
 		
 		//Returning all available Skill from wiki in form of List
 		List<Skill> skills = new ArrayList<>();
-		
-		try {
 			
-			Element skill_table = Ship_Details.get(9 + mod);
+		Element skill_table = Ship_Details.get(9 + mod);
 			
-			for (Element element : skill_table.select("tr")) {
+		for (Element element : skill_table.select("tr")) {
 				
-				Elements row = element.select("td");
+			Elements row = element.select("td");
 				
-				if(row.size() != 3) continue;
+			if(row.size() != 3) continue;
 				
-				String name = row.get(1).text();
-				String desc = row.get(2).text();
+			String name = row.get(1).text();
+			String desc = row.get(2).text();
 				
-				if(name.isEmpty()) break;
-				else name = name.substring(0, name.indexOf("C"));
+			if(name.isEmpty()) break;
+			else name = name.substring(0, name.indexOf("C"));
 				
-				String style = row.get(1).attr("style");
-				int type;
+			String style = row.get(1).attr("style");
+			int type;
 				
-				if(style.contains("Gold")) type = Skill.YELLOW;
-				else if(style.contains("Pink")) type = Skill.RED;
-				else if(style.contains("Blue")) type = Skill.BLUE;
-				else type = -1;
+			if(style.contains("Gold")) type = Skill.SUPPORT;
+			else if(style.contains("Pink")) type = Skill.ASSAULT;
+			else if(style.contains("Blue")) type = Skill.DEFENSE;
+			else type = -1;
 				
-				//System.out.println(name + " " + type);
-				//System.out.println(desc);
-				//System.out.println("");
-				
-				skills.add(new Skill(name, desc, type));
+			skills.add(new Skill(name, desc, type));
 				
 				
-			}
-			
-			return skills;
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println("Something when wrong when downloading data for skill");
-			
-			return null;
-			
 		}
+			
+		return skills;
 		
 	}
 	
@@ -192,35 +171,24 @@ public class WebAdapter {
 		//Returning available equipment from wiki in form of List
 		List<Equipment> equipments = new ArrayList<>();
 		
-		try {
-			
-			Element equipment_table = Ship_Details.get(6 + mod);
+		Element equipment_table = Ship_Details.get(6 + mod);
 				
-			for (Element element : equipment_table.select("tr")) {
+		for (Element element : equipment_table.select("tr")) {
 				
-				Elements row = element.select("td");
+			Elements row = element.select("td");
 				
-				if(row.size() < 3) continue;
+			if(row.size() < 3) continue;
 				
-				String equipment_efficiency = row.get(1).text();
-				String equipment_name = row.get(2).text();
+			String equipment_efficiency = row.get(1).text();
+			String equipment_name = row.get(2).text();
 				
-				if(!equipment_efficiency.contentEquals("None")) equipment_efficiency = equipment_efficiency.split(" ")[2];
+			if(!equipment_efficiency.contentEquals("None")) equipment_efficiency = equipment_efficiency.split(" ")[2];
 			
-				equipments.add(new Equipment(equipment_efficiency, equipment_name));
-				
-			}
-			
-			return equipments;
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			
-			System.out.println("Something when wrong when downloading data for equipment");
-			
-			return null;
+			equipments.add(new Equipment(equipment_efficiency, equipment_name));
 			
 		}
+
+		return equipments;
 		
 	}
 	
@@ -341,4 +309,20 @@ public class WebAdapter {
 		
 	}
 
+	public Image getIcon(String name) throws Exception{
+		
+		Image img = null;
+		String link = "https://azurlane.koumakan.jp";
+		String tag = "img[alt='" + name + "Icon.png']";
+		
+		Elements image_icon = Ship_Page.select(tag);
+		
+		link += image_icon.get(0).attr("src");
+		
+		img = ImageIO.read(new URL(link));
+		
+		return img;
+		
+	}
+	
 }

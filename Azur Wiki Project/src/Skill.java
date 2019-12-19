@@ -1,44 +1,75 @@
+import java.awt.Color;
 
 public class Skill {
 
-	private String Name;
-	private String Description;
-	private int Type;
+	private String name;
+	private String description;
+	private int type;
 	
-	final static public int RED = 0;
-	final static public int YELLOW = 0;
-	final static public int BLUE = 0;
+	final static public int ASSAULT = 0;
+	final static public int SUPPORT = 1;
+	final static public int DEFENSE = 2;
 	
-	Skill(String Name, String Description, int Type){
+	Skill(String name, String description, int type){
 		//Basic Stuff
-		this.Name = Name;
-		this.Description = Description;
-		this.Type = Type;
+		this.name = name;
+		this.description = description;
+		this.type = type;
+		
+	}
+	
+	public Color getSkillColor() {
+		
+		Color background = Color.white;
+		
+		switch(type) {
+		
+		case ASSAULT:
+			
+			background = new Color(255, 192, 203);
+			
+			break;
+			
+		case SUPPORT:
+			
+			background = new Color(255, 215, 0);
+			
+			break;
+			
+		case DEFENSE:
+			
+			background = new Color(0, 191, 255);
+			
+			break;
+		
+		}
+		
+		return background;
 		
 	}
 
 	public String getName() {
-		return Name;
+		return name;
 	}
 
 	public void setName(String name) {
-		Name = name;
+		this.name = name;
 	}
 
 	public String getDescription() {
-		return Description;
+		return description;
 	}
 
 	public void setDescription(String description) {
-		Description = description;
+		this.description = description;
 	}
 
 	public int getType() {
-		return Type;
+		return type;
 	}
 
 	public void setType(int type) {
-		Type = type;
+		this.type = type;
 	}
 	
 	

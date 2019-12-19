@@ -17,11 +17,24 @@ public class Run {
 	
 	private void mainRun() {
 		
-		WebAdapter webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
-		ShipContainer container = webAdapter.requestShipList();
+		WebAdapter webAdapter;
+		ShipContainer container = null;
+		try {
+			
+			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
+			container = webAdapter.requestShipList();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("Something Went Wrong When Connecting To The Server. Perhaps the server is down or your connection.");
+
+		}
+		
 		
 		if(console_mode) console(container);
 		//else run_windows(container);
+		
+		//
 		
 		
 	}
@@ -278,7 +291,7 @@ public class Run {
 						} catch (Exception e) {
 							// TODO: handle exception
 							
-							System.out.println(e.getMessage());
+							System.out.println(" > " + e.getMessage());
 						}
 						
 						break;
@@ -308,19 +321,19 @@ public class Run {
 	
 	private void debug() {
 		
-		WebAdapter webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
-		ShipContainer container = webAdapter.requestShipList();
-
-		for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
-			
-			//if(ship.getName().contentEquals("San Diego")) { ship.getData(); run_windows(ship);}
-			if(ship.getName().contentEquals("Jean Bart")) { ship.getData(); run_windows(ship);}
-			//if(ship.getName().contentEquals("Enterprise")) { ship.getData(); run_windows(ship);}
-			if(ship.getName().contentEquals("Ayanami")) { ship.getData(); run_windows(ship);}
-			if(ship.getName().contentEquals("Bogue")) { ship.getData(); run_windows(ship);}
-			if(ship.getName().contentEquals("Long Island")) { ship.getData(); run_windows(ship);}
-			
-		}
+//		WebAdapter webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
+//		ShipContainer container = webAdapter.requestShipList();
+//
+//		for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
+//			
+//			//if(ship.getName().contentEquals("San Diego")) { ship.getData(); run_windows(ship);}
+//			if(ship.getName().contentEquals("Jean Bart")) { ship.getData(); run_windows(ship);}
+//			//if(ship.getName().contentEquals("Enterprise")) { ship.getData(); run_windows(ship);}
+//			if(ship.getName().contentEquals("Ayanami")) { ship.getData(); run_windows(ship);}
+//			if(ship.getName().contentEquals("Bogue")) { ship.getData(); run_windows(ship);}
+//			if(ship.getName().contentEquals("Long Island")) { ship.getData(); run_windows(ship);}
+//			
+//		}
 		
 		
 	}

@@ -8,6 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -19,18 +21,23 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import javafx.scene.control.Separator;
+
 public class WindowsManager {
+	
+	private static JFrame frame;
 	
 	public static void ship_detail_window(Ship ship) {
 		
 		if(ship == null) return;
 		
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
 		frame.setPreferredSize(new Dimension(1500, 880));
@@ -71,30 +78,29 @@ public class WindowsManager {
 	}
 	
 	private static JPanel ship_detail_sidebar_window(Ship ship) {
-		
-		Color background = new Color(255,255,255);
+	
 		Color panel_background = new Color(0, 0, 0, 100);
 		
 		JPanel panel = new JPanel();
 		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10))); //UP LEFT DOWN RIGHT
+		
+		JPanel img_container = new JPanel();
+		img_container.setPreferredSize(new Dimension(337, 512));
 		try {
 			
-			JPanel img_container = new JPanel();
-			
-			img_container.setPreferredSize(new Dimension(337, 512));
 			img_container = ship.loadImage(0);
 			
 			//img_container.setBorder(BorderFactory.createLineBorder(Color.black, 2));
-			
-			panel.add(img_container);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			
 			
 		}
+		
+		panel.add(img_container);
 		
 		JPanel name_panel = new JPanel();
 		name_panel.setLayout(new FlowLayout());
@@ -137,62 +143,7 @@ public class WindowsManager {
 		
 		
 		ship_type.setOpaque(true);
-		
-		switch(ship.getType()) {
-		
-		case "Destroyer":
-			
-			background = new Color(176, 224, 230);
-			
-			break;
-			
-		case "Light Cruiser":
-		case "Heavy Cruiser":
-			background = new Color(255, 222, 173);
-			
-			break;
-			
-		case "Large Cruiser":
-			
-			background = new Color(255, 160, 122);
-			
-			break;
-			
-		case "Monitor":
-			
-			background = new Color(255, 222, 173);
-			
-			break;
-			
-		case "Battleship":
-		case "Battlecruiser":
-		case "Aviation Battleship":
-			background = new Color(255, 192, 203);
-			
-			break;
-			
-		case "Aircraft Carrier":
-		case "Light Aircraft Carrier":
-			
-			background = new Color(221, 160, 221);
-			
-			break;
-			
-		case "Submarine":	
-		case "Submarine Carrier":
-			background = new Color(102, 255, 153);
-			
-			break;
-			
-		case "Repair Ship":
-			
-			background = new Color(127, 255, 212);
-			
-			break;
-		
-		}
-		
-		ship_type.setBackground(background);
+		ship_type.setBackground(ship.getTypeColor());
 		
 		g.gridx = g.gridy = 0;
 		sub_panel.add(ship_type_label, g);
@@ -215,36 +166,7 @@ public class WindowsManager {
 		rarity_label.setOpaque(true);
 		
 		rarity.setOpaque(true);
-		background = new Color(255, 255, 255);
-		
-		switch (ship.getRarity()) {
-		case "Unreleased":
-		case "Normal":
-			background = new Color(220, 220, 220);
-			
-			break;
-			
-		case "Rare":
-			
-			background = new Color(176, 224, 230);
-			
-			break;
-			
-		case "Elite":
-			
-			background = new Color(221, 160, 221);
-			
-			break;
-			
-		case "Super Rare":
-			
-			background = new Color(238, 232, 170);
-			
-			break;
-
-		}
-		
-		rarity.setBackground(background);
+		rarity.setBackground(ship.getRarityColor());
 		
 		
 		g.gridx = 0; g.gridy = 1;
@@ -291,60 +213,7 @@ public class WindowsManager {
 		faction_label.setOpaque(true);
 		
 		faction.setOpaque(true);
-		background = new Color(220, 220, 220);
-		
-		switch (ship.getFaction()) {
-		case "Eagle Union":
-			
-			background = new Color(176, 224, 230);
-			
-			break;
-			
-		case "Eastern Radiance":
-			
-			background = new Color(221, 160, 221);
-			
-			break;
-			
-		case "Iris Libre":
-			
-			background = new Color(255, 215, 0);
-			
-			break;
-			
-		case "Ironblood":
-			
-			background = new Color(255, 192, 203);
-			
-			break;
-			
-		case "Royal Navy":
-			
-			background = new Color(131, 170, 240);
-			
-			break;
-			
-		case "Sakura Empire":
-			
-			background = new Color(255, 240, 245);
-			
-			break;
-			
-		case "Sardegna Empire":
-			
-			background = new Color(110, 190, 147);
-			
-			break;
-			
-		case "Vichya Dominion":
-			
-			background = new Color(215, 124, 124);
-			
-			break;
-
-		}
-		
-		faction.setBackground(background);
+		faction.setBackground(ship.getFactionColor());
 		
 		g.gridx = 0; g.gridy = 3;
 		sub_panel.add(faction_label, g);
@@ -352,7 +221,7 @@ public class WindowsManager {
 		sub_panel.add(faction, g);
 		
 		sub_panel.setBorder(new EmptyBorder(0, 0, 10, 0));
-		sub_panel.setBackground(new Color(0, 0, 0, 255));
+		sub_panel.setBackground(new Color(0, 0, 0, 0));
 		
 		panel.setBackground(panel_background);
 		panel.setPreferredSize(new Dimension(390, 850));
@@ -380,21 +249,58 @@ public class WindowsManager {
 		JLabel ship_name = new JLabel(ship.getName(), JLabel.LEFT);
 		ship_name.setFont(new Font("Serif", Font.PLAIN, 40));
 		ship_name.setPreferredSize(new Dimension(200, 50));
-		ship_name.setForeground(Color.black);
+		ship_name.setForeground(Color.white);
 		
 		header.add(ship_name);
-		header.setBackground(new Color(220, 220, 220, 180));
+		header.setBackground(new Color(100, 100, 100, 180));
 		header.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
-		//header.setPreferredSize(new Dimension(1100, 50));
+		JPanel main_panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		
-		JScrollPane main_panel = new JScrollPane();
-		main_panel.setPreferredSize(new Dimension(1070, 750));
-		
-		main_panel.setOpaque(false);
 		main_panel.setBackground(new Color(0, 0, 0, 0));
 		
-		main_panel.setViewportView(ship_detail_main_scroll_page(ship));
+		JScrollPane main_scroll_panel = new JScrollPane();
+		main_scroll_panel.setPreferredSize(new Dimension(770, 730));
+		
+		main_scroll_panel.setOpaque(false);
+		
+		main_scroll_panel.setViewportView(ship_detail_main_scroll_page(ship));
+		main_scroll_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		main_scroll_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		main_scroll_panel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				frame.repaint();
+				
+			}
+		});
+		
+		main_scroll_panel.getViewport().setOpaque(false);
+		main_scroll_panel.getViewport().setBackground(new Color(0, 0, 0, 0));
+		main_scroll_panel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
+		
+		main_scroll_panel.setBackground(new Color(0, 0, 0, 0));
+		
+		JPanel faction_banner = new JPanel();
+		faction_banner.setLayout(new BoxLayout(faction_banner, BoxLayout.Y_AXIS));
+		faction_banner.setBackground(ship.getFactionColor());
+		faction_banner.setPreferredSize(new Dimension(285, 730));
+		
+		JLabel faction_title = new JLabel(ship.getFaction(), JLabel.CENTER);
+		faction_title.setFont(new Font("Serif", Font.BOLD, 40));
+		faction_title.setPreferredSize(new Dimension(270, 50));
+		faction_title.setForeground(Color.black);
+		faction_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+		faction_title.setAlignmentY(Component.CENTER_ALIGNMENT);
+		
+		faction_banner.add(faction_title);
+		faction_banner.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		main_panel.add(main_scroll_panel);
+		main_panel.add(faction_banner);
 		
 		sub_panel.add(header);
 		sub_panel.add(main_panel);
@@ -409,31 +315,99 @@ public class WindowsManager {
 		
 		JPanel panel = new JPanel();
 		
-		panel.setPreferredSize(new Dimension(1050, 730));
+		panel.setPreferredSize(new Dimension(1050, (110 * ship.getSkills().size()) + 220 + 250));
 		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
+		JPanel sub_header_title = new JPanel();
+		sub_header_title.setLayout(new BoxLayout(sub_header_title, BoxLayout.Y_AXIS));
+		
 		JLabel stat_title = new JLabel("Stats");
-		stat_title.setFont(new Font("Serif", Font.PLAIN, 20));
+		stat_title.setFont(new Font("Serif", Font.PLAIN, 30));
 		stat_title.setForeground(Color.white);
 		stat_title.setAlignmentX(Component.LEFT_ALIGNMENT);
+		stat_title.setBorder(new EmptyBorder(0, 10, 0, 10));
 		
-		panel.add(stat_title);
+		JSeparator separator = new JSeparator(JSeparator.HORIZONTAL);
+		
+		separator.setBorder(new EmptyBorder(10, 10, 10, 0));
+		separator.setForeground(Color.white);
+		separator.setPreferredSize(new Dimension(1000, 5));
+		
+		sub_header_title.add(stat_title);
+		sub_header_title.add(separator);
+		
+		sub_header_title.setMaximumSize(new Dimension(1000, 50));
+		sub_header_title.setBackground(null);
+		
+		panel.add(sub_header_title);
 		
 		JPanel stat_table = new JPanel(new BorderLayout());
-		
 		stat_table.add(stat_table(ship), BorderLayout.CENTER);
-		
 		stat_table.setAlignmentX(Component.LEFT_ALIGNMENT);
 		stat_table.setMaximumSize(new Dimension(620, 220));
-				
+		
 		panel.add(stat_table);
 		
+		JPanel sub_header_skill = new JPanel();
+		
+		sub_header_skill.setLayout(new BoxLayout(sub_header_skill, BoxLayout.Y_AXIS));
+		
 		JLabel skill_title = new JLabel("Skills");
-		skill_title.setFont(new Font("Serif", Font.PLAIN, 20));
+		skill_title.setFont(new Font("Serif", Font.PLAIN, 30));
 		skill_title.setForeground(Color.white);
 		skill_title.setAlignmentX(Component.LEFT_ALIGNMENT);
-		panel.add(skill_title);
+		skill_title.setBorder(new EmptyBorder(10, 10, 0, 10));
+		
+		JSeparator separator1 = new JSeparator(JSeparator.HORIZONTAL);
+		
+		separator1.setBorder(new EmptyBorder(10, 0, 10, 0));
+		separator1.setForeground(Color.white);
+		separator1.setPreferredSize(new Dimension(1000, 5));
+		
+		sub_header_skill.add(skill_title);
+		sub_header_skill.add(separator1);
+		
+		sub_header_skill.setMaximumSize(new Dimension(1000, 60));
+		sub_header_skill.setBackground(null);
+		
+		sub_header_skill.setBorder(new EmptyBorder(0, 10, 0, 10));
+		
+		panel.add(sub_header_skill);
+		
+		JPanel skill_table = new JPanel(new BorderLayout());
+		skill_table.add(skill_table(ship), BorderLayout.CENTER);
+		skill_table.setAlignmentX(Component.LEFT_ALIGNMENT);
+		skill_table.setMaximumSize(new Dimension(740, 110 * ship.getSkills().size() + 20));
+		skill_table.setBackground(null);
+		skill_table.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		panel.add(skill_table);
+		
+		JPanel sub_header_equipment = new JPanel();
+		sub_header_equipment.setLayout(new BoxLayout(sub_header_equipment, BoxLayout.Y_AXIS));
+		
+		JLabel equipment_title = new JLabel("Equipment");
+		equipment_title.setFont(new Font("Serif", Font.PLAIN, 30));
+		equipment_title.setForeground(Color.white);
+		equipment_title.setAlignmentX(Component.LEFT_ALIGNMENT);
+		equipment_title.setBorder(new EmptyBorder(0, 10, 0, 10));
+		
+		JSeparator separator2 = new JSeparator(JSeparator.HORIZONTAL);
+		
+		separator2.setBorder(new EmptyBorder(10, 0, 10, 0));
+		separator2.setForeground(Color.white);
+		separator2.setPreferredSize(new Dimension(1000, 5));
+		
+		sub_header_equipment.add(equipment_title);
+		sub_header_equipment.add(separator2);
+		
+		sub_header_equipment.setMaximumSize(new Dimension(1000, 50));
+		sub_header_equipment.setBackground(null);
+		
+		sub_header_equipment.setBorder(new EmptyBorder(0, 10, 0, 10));
+		
+		panel.add(sub_header_equipment);
 		
 		panel.setBackground(new Color(0,0,0,0));
 		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -458,8 +432,8 @@ public class WindowsManager {
 		Dimension head_dimension = new Dimension(50, 50);
 		Dimension content_dimension = new Dimension(100, 50);
 		
-		Color head_column = new Color(220, 220, 220, 150);
-		Color content_column = new Color(255, 255, 255, 100);
+		Color content_column = new Color(220, 220, 220, 255);
+		Color head_column = new Color(255, 255, 255, 200);
 		
 		Border border = BorderFactory.createLineBorder(Color.black);
 		
@@ -541,15 +515,12 @@ public class WindowsManager {
 		JLabel asw_label = new JLabel("ASW", JLabel.CENTER);
 		
 		asw_label.setPreferredSize(head_dimension);
-		
 		asw_label.setOpaque(true);
-		
 		asw_label.setBackground(head_column);
-		
 		asw_label.setBorder(border);
 		
 		JLabel health = new JLabel(Integer.toString(ship.getHealth()), JLabel.CENTER);
-		JLabel armor = new JLabel(ship.getArmour_type(), JLabel.CENTER);
+		JLabel armor = new JLabel(Utilities.nvl(ship.getArmour_type(), "-"), JLabel.CENTER);
 		JLabel oc = new JLabel(Integer.toString(ship.getOil_consumtion()), JLabel.CENTER);
 		JLabel speed = new JLabel(Integer.toString(ship.getSpeed()), JLabel.CENTER);
 		
@@ -689,6 +660,69 @@ public class WindowsManager {
 		panel.setBackground(new Color(0, 0, 0, 0));
 		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		panel.setPreferredSize(new Dimension(840, 200));
+		
+		return panel;
+		
+	}
+	
+	private static JPanel skill_table(Ship ship) {
+		
+		JPanel panel = new JPanel();
+		
+		if(ship.getSkills() == null) {
+			
+			System.out.println("No skill");
+			
+		} else {
+			
+			panel.setLayout(new GridBagLayout());
+			
+			GridBagConstraints g = new GridBagConstraints();
+			
+			g.gridx = g.gridy = 0;
+			
+			g.insets.bottom = g.insets.left = g.insets.right = g.insets.top = 0;
+			g.weightx = g.weighty = 1;
+			
+			for (Skill skill : ship.getSkills()) {
+				
+				g.gridx = 0;
+				
+				JPanel skill_title_container = new JPanel();
+				JLabel skill_title = new JLabel("<html>" + skill.getName() + "</html>", JLabel.CENTER);
+				skill_title.setPreferredSize(new Dimension(100, 100));
+				skill_title.setOpaque(true);
+				skill_title.setBackground(skill.getSkillColor());
+				skill_title.setBorder(new EmptyBorder(10, 10, 10, 10));
+				skill_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+				
+				skill_title_container.add(skill_title);
+				skill_title_container.setMaximumSize(new Dimension(110, 110));
+				
+				skill_title_container.setBackground(new Color(255, 255, 153, 100));
+				
+				panel.add(skill_title_container, g);
+				
+				g.gridx = 1;
+				JPanel skill_desc_container = new JPanel();
+				JLabel skill_desc = new JLabel("<html>" + skill.getDescription() + "</html>", JLabel.LEFT);
+				skill_desc.setPreferredSize(new Dimension(600, 100));
+				skill_desc.setOpaque(true);
+				skill_desc.setBackground(new Color(220, 220, 220, 255));
+				skill_desc.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+				skill_desc_container.add(skill_desc);
+				skill_desc_container.setMaximumSize(new Dimension(620, 110));
+				
+				panel.add(skill_desc, g);
+				
+				g.gridy++;
+				
+			}
+			
+		}
+		
+		panel.setBackground(new Color(255, 255, 255, 100));
 		
 		return panel;
 		

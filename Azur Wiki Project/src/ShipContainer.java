@@ -144,7 +144,7 @@ public class ShipContainer{
 		//Another note if the average calculated status is 0 that means currently there is no ship data. Fetch it first from the web
 		try {
 			
-			System.out.println("Starting Calculate Average Stats !");
+			System.out.println(" > Starting Calculate Average Stats !");
 			
 			for (Ship ship : NormalShip) {
 				
@@ -166,7 +166,7 @@ public class ShipContainer{
 					
 					total_ship[type]++;
 					
-				} else System.out.println(ship.getName() + " type error");
+				} else System.out.println(" > Something wrong when looking for " + ship.getName() + " type");
 				
 			}
 			
@@ -190,7 +190,7 @@ public class ShipContainer{
 					
 					total_ship[type]++;
 					
-				} else System.out.println(ship.getName() + " type error");
+				} else System.out.println(" > Something wrong when looking for " + ship.getName() + " type");
 
 				
 			}
@@ -213,13 +213,13 @@ public class ShipContainer{
 					
 				} catch (Exception e) {
 					// TODO: handle exception
-					System.out.println(e.getMessage());
+					System.out.println(" > Can't calculate Average ");
 					
 				}
 			
 			}
 			
-			System.out.println("Calculating The Average Stats Success !");
+			System.out.println(" > Calculating The Average Stats Success !");
 			
 		} catch (Exception e) {
 			// TODO: handle exception
