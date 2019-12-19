@@ -140,7 +140,25 @@ public class Run {
 						
 					case "get":
 						
+						String name = "";
+						
 						try {
+							
+							try {
+								String temp[] = cmd[2].split("_");
+								name = "";
+								
+								for (String string : temp) {
+									
+									name += " " + string;
+									
+								}
+								
+								name = name.substring(1);
+								
+							} catch (Exception e) {
+								// TODO: handle exception
+							}
 							
 							switch (cmd[1]) {
 							case "all":
@@ -178,7 +196,7 @@ public class Run {
 								
 								for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
 								
-									if(ship.getName().contentEquals(cmd[2])) {
+									if(ship.getName().contentEquals(name)) {
 										
 										if(!ship.isDownloaded()) ship.getData();
 										
@@ -199,9 +217,21 @@ public class Run {
 							
 							case "priority":
 								
+								String temp[] = cmd[2].split("_");
+								
+								name = "";
+								
+								for (String string : temp) {
+									
+									name += " " + string;
+									
+								}
+								
+								name = name.substring(1);
+								
 								for (Ship ship : container.getShip(ShipContainer.PRIORITY_SHIP)) {
 									
-									if(ship.getName().contentEquals(cmd[2])) {
+									if(ship.getName().contentEquals(name)) {
 										
 										if(!ship.isDownloaded()) ship.getData();
 										
@@ -224,7 +254,7 @@ public class Run {
 								
 								for (Ship ship : container.getShip(ShipContainer.COLLAB_SHIP)) {
 								
-									if(ship.getName().contentEquals(cmd[2])) {
+									if(ship.getName().contentEquals(name)) {
 										
 										if(!ship.isDownloaded()) ship.getData();
 										

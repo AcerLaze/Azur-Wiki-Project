@@ -31,9 +31,9 @@ public class WindowsManager {
 		if(ship == null) return;
 		
 		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
-		frame.setPreferredSize(new Dimension(1500, 875));
+		frame.setPreferredSize(new Dimension(1500, 880));
 		frame.setResizable(false);
 		frame.setUndecorated(false);
 		
@@ -70,7 +70,7 @@ public class WindowsManager {
 		
 	}
 	
-	public static JPanel ship_detail_sidebar_window(Ship ship) {
+	private static JPanel ship_detail_sidebar_window(Ship ship) {
 		
 		Color background = new Color(255,255,255);
 		Color panel_background = new Color(0, 0, 0, 100);
@@ -363,7 +363,7 @@ public class WindowsManager {
 		
 	}
 	
-	public static JPanel ship_detail_main_window(Ship ship) {
+	private static JPanel ship_detail_main_window(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(0, 0, 0, 0));
@@ -380,10 +380,10 @@ public class WindowsManager {
 		JLabel ship_name = new JLabel(ship.getName(), JLabel.LEFT);
 		ship_name.setFont(new Font("Serif", Font.PLAIN, 40));
 		ship_name.setPreferredSize(new Dimension(200, 50));
-		ship_name.setForeground(Color.white);
+		ship_name.setForeground(Color.black);
 		
 		header.add(ship_name);
-		header.setBackground(new Color(102, 204, 255, 190));
+		header.setBackground(new Color(220, 220, 220, 180));
 		header.setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		//header.setPreferredSize(new Dimension(1100, 50));
@@ -391,16 +391,73 @@ public class WindowsManager {
 		JScrollPane main_panel = new JScrollPane();
 		main_panel.setPreferredSize(new Dimension(1070, 750));
 		
-		JViewport viewport = new JViewport();
-		
-		main_panel.setViewport(viewport);
-		main_panel.getViewport().setOpaque(false);
 		main_panel.setOpaque(false);
+		main_panel.setBackground(new Color(0, 0, 0, 0));
+		
+		main_panel.setViewportView(ship_detail_main_scroll_page(ship));
 		
 		sub_panel.add(header);
 		sub_panel.add(main_panel);
 		
 		panel.add(sub_panel);
+		
+		return panel;
+		
+	}
+	
+	private static JPanel ship_detail_main_scroll_page(Ship ship) {
+		
+		JPanel panel = new JPanel();
+		
+		panel.setPreferredSize(new Dimension(1050, 730));
+		
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		JLabel stat_title = new JLabel("Stats", JLabel.LEFT);
+		stat_title.setFont(new Font("Serif", Font.PLAIN, 20));
+		stat_title.setForeground(Color.white);
+		
+		panel.add(stat_title);
+		
+		panel.add(stat_table(ship));
+		
+		panel.setBackground(new Color(0,0,0,0));
+		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		
+		return panel;
+		
+	}
+	
+	private static JPanel stat_table(Ship ship) {
+		
+		JPanel panel = new JPanel();
+		
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints g = new GridBagConstraints();
+		
+		JLabel health_label = new JLabel("HP");
+		JLabel armor_label = new JLabel("Armour");
+		JLabel oc_label = new JLabel("OC");
+		JLabel speed_label = new JLabel("SPD");
+		
+		JLabel luck_label = new JLabel("Luck");
+		JLabel evasion_label = new JLabel("EVA");
+		JLabel reload_label = new JLabel("Reload");
+		JLabel accuracy_label = new JLabel("ACC");
+		
+		JLabel firepower_label = new JLabel("FP");
+		JLabel torpedo_label = new JLabel("TORP");
+		JLabel aviation_label = new JLabel("AVI");
+		JLabel aa_label = new JLabel("AA");
+		
+		JLabel asw_label = new JLabel("ASW");
+		
+		JLabel health = new JLabel(Integer.toString(ship.getHealth()));
+		JLabel armor = new JLabel(ship.getArmour_type());
+		JLabel oc = new JLabel(Integer.toString(ship.getOil_consumtion()));
+		JLabel speed = new JLabel(Integer.toString(ship.getSpeed()));
+		
 		
 		return panel;
 		

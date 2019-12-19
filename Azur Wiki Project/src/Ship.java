@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -88,7 +87,6 @@ public class Ship {
 	public void getData() {
 		
 		WebAdapter web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
-		setDownloaded(true);
 		
 		if(!rarity.contentEquals("Unreleased")) {
 			//If the ship is unrelease, dont bother to fetch more data or it will cause error
@@ -144,6 +142,8 @@ public class Ship {
 				image.add(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
 				
 			};
+			
+			setDownloaded(true);
 		
 			web_adapter.getShipStat(this);
 		
@@ -199,8 +199,11 @@ public class Ship {
 			break;
 			
 		case "Super Rare":
-			
+		case "Priority":
 			background = new Color(255, 232, 170, 180);
+			
+			break;
+				
 		}
 		
 		image_panel.setBackground(background);
