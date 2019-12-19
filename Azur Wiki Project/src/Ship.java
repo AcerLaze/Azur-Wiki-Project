@@ -203,7 +203,8 @@ public class Ship {
 			background = new Color(255, 232, 170, 180);
 			
 			break;
-				
+			
+			
 		}
 		
 		image_panel.setBackground(background);
