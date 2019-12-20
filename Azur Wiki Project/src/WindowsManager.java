@@ -27,8 +27,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import javafx.scene.control.Separator;
-
 public class WindowsManager {
 	
 	private static JFrame frame;
@@ -289,12 +287,14 @@ public class WindowsManager {
 		faction_banner.setBackground(ship.getFactionColor());
 		faction_banner.setPreferredSize(new Dimension(285, 730));
 		
-		JLabel faction_title = new JLabel(ship.getFaction(), JLabel.CENTER);
+		JLabel faction_title = new JLabel("<html><body style='text-align: center'>" + ship.getFaction() + "</body></html>", JLabel.CENTER);
 		faction_title.setFont(new Font("Serif", Font.BOLD, 40));
 		faction_title.setPreferredSize(new Dimension(270, 50));
 		faction_title.setForeground(Color.black);
 		faction_title.setAlignmentX(Component.CENTER_ALIGNMENT);
-		faction_title.setAlignmentY(Component.CENTER_ALIGNMENT);
+		faction_title.setOpaque(true);
+		faction_title.setBackground(null);
+		faction_title.setBorder(new EmptyBorder(100, 10, 10, 10));
 		
 		faction_banner.add(faction_title);
 		faction_banner.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -315,7 +315,7 @@ public class WindowsManager {
 		
 		JPanel panel = new JPanel();
 		
-		panel.setPreferredSize(new Dimension(1050, (110 * ship.getSkills().size()) + 220 + 250));
+		panel.setPreferredSize(new Dimension(1050, (110 * ship.getSkills().size()) + 600));
 		
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
@@ -408,6 +408,15 @@ public class WindowsManager {
 		sub_header_equipment.setBorder(new EmptyBorder(0, 10, 0, 10));
 		
 		panel.add(sub_header_equipment);
+		
+		JPanel equipment_table = new JPanel(new BorderLayout());
+		equipment_table.add(equipment_table(ship), BorderLayout.CENTER);
+		equipment_table.setAlignmentX(Component.LEFT_ALIGNMENT);
+		equipment_table.setMaximumSize(new Dimension(320, 180));
+		equipment_table.setBackground(null);
+		equipment_table.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		panel.add(equipment_table);
 		
 		panel.setBackground(new Color(0,0,0,0));
 		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -689,13 +698,13 @@ public class WindowsManager {
 				g.gridx = 0;
 				
 				JPanel skill_title_container = new JPanel();
-				JLabel skill_title = new JLabel("<html>" + skill.getName() + "</html>", JLabel.CENTER);
+				JLabel skill_title = new JLabel("<html><body style='text-align: center'>" + skill.getName() + "</body></html>", JLabel.CENTER);
 				skill_title.setPreferredSize(new Dimension(100, 100));
 				skill_title.setOpaque(true);
 				skill_title.setBackground(skill.getSkillColor());
-				skill_title.setBorder(new EmptyBorder(10, 10, 10, 10));
+				System.out.println(skill.getName());
 				skill_title.setAlignmentX(Component.CENTER_ALIGNMENT);
-				
+				skill_title.setFont(new Font(skill_title.getFont().getFontName(), Font.BOLD, 20));
 				skill_title_container.add(skill_title);
 				skill_title_container.setMaximumSize(new Dimension(110, 110));
 				
@@ -715,6 +724,84 @@ public class WindowsManager {
 				skill_desc_container.setMaximumSize(new Dimension(620, 110));
 				
 				panel.add(skill_desc, g);
+				
+				g.gridy++;
+				
+			}
+			
+		}
+		
+		panel.setBackground(new Color(255, 255, 255, 100));
+		
+		return panel;
+		
+	}
+	
+	private static JPanel equipment_table(Ship ship) {
+		
+		JPanel panel = new JPanel();
+		
+		if(ship.getSkills() == null) {
+			
+			System.out.println("No skill");
+			
+		} else {
+			
+			panel.setLayout(new GridBagLayout());
+			
+			GridBagConstraints g = new GridBagConstraints();
+			
+			g.gridx = g.gridy = 0;
+			
+			g.insets.bottom = g.insets.left = g.insets.right = g.insets.top = 0;
+			g.weightx = g.weighty = 1;
+			
+			JLabel equipment_label = new JLabel("Equipment Name", JLabel.CENTER);
+			
+			equipment_label.setPreferredSize(new Dimension(150, 40));
+			equipment_label.setOpaque(true);
+			equipment_label.setBackground(Color.gray);
+			equipment_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			equipment_label.setBorder(BorderFactory.createLineBorder(Color.black));
+			equipment_label.setFont(new Font(equipment_label.getFont().getFontName(), Font.BOLD, 15));
+			
+			panel.add(equipment_label, g);
+			g.gridx++;
+			
+			JLabel efficiency_label = new JLabel("Equipment Name", JLabel.CENTER);
+			
+			efficiency_label.setPreferredSize(new Dimension(150, 40));
+			efficiency_label.setOpaque(true);
+			efficiency_label.setBackground(Color.gray);
+			efficiency_label.setAlignmentX(Component.CENTER_ALIGNMENT);
+			efficiency_label.setBorder(BorderFactory.createLineBorder(Color.black));
+			efficiency_label.setFont(new Font(equipment_label.getFont().getFontName(), Font.BOLD, 15));
+			
+			panel.add(efficiency_label, g);
+			
+			g.gridy++;
+			
+			for (Equipment equip : ship.getEquipments()) {
+				
+				g.gridx = 0;
+				
+				JLabel equipment_name = new JLabel(equip.getEquipment_name(), JLabel.CENTER);
+				equipment_name.setPreferredSize(new Dimension(150, 40));
+				equipment_name.setOpaque(true);
+				equipment_name.setBackground(new Color(255, 255, 255, 200));
+				equipment_name.setBorder(BorderFactory.createLineBorder(Color.black));
+				equipment_name.setAlignmentX(Component.CENTER_ALIGNMENT);
+				
+				panel.add(equipment_name, g);
+				
+				g.gridx = 1;
+				JLabel efficiency = new JLabel(equip.getEfficiency(), JLabel.CENTER);
+				efficiency.setPreferredSize(new Dimension(150, 40));
+				efficiency.setOpaque(true);
+				efficiency.setBackground(new Color(255, 255, 255, 200));
+				efficiency.setBorder(BorderFactory.createLineBorder(Color.black));
+		
+				panel.add(efficiency, g);
 				
 				g.gridy++;
 				

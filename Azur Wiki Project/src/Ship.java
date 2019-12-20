@@ -134,6 +134,7 @@ public class Ship {
 			
 			skills = web_adapter.requestShipSkill();
 			equipments = web_adapter.requestShipEquipment();
+			
 			construction_time = web_adapter.requestConstructionTime();
 			ship_class = web_adapter.requestClass();
 			
@@ -265,6 +266,30 @@ public class Ship {
 			e.printStackTrace();
 			
 		}
+		
+	}
+	
+	public Color getOpacityColor(String type, double opacity) {
+		
+		switch (type) {
+		case "Faction":
+			
+			return new Color(getFactionColor().getRed(), getFactionColor().getGreen(), getFactionColor().getBlue(), (int)(255 * opacity));
+
+		case "Rarity":
+			
+			return new Color(getRarityColor().getRed(), getRarityColor().getGreen(), getRarityColor().getBlue(), (int)(255 * opacity));
+			
+		case "Type":
+			
+			return new Color(getTypeColor().getRed(), getTypeColor().getGreen(), getTypeColor().getBlue(), (int)(255 * opacity));
+			
+		default:
+			
+			return null;
+
+		}
+		
 		
 	}
 	
