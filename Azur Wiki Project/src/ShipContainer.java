@@ -10,6 +10,7 @@ public class ShipContainer{
 	private List<Ship> NormalShip;
 	private List<Ship> PriorityShip;
 	private List<Ship> CollabShip;
+	private List<Faction> factionList;
 	
 	private Ship[] avg_ship_holder;
 	private Integer[] total_ship;
@@ -259,4 +260,12 @@ public class ShipContainer{
 		this.avg_ship_holder = avg_ship_holder;
 	}
 
+	public List<Faction> getFactionList() {
+		return factionList;
+	}
+
+	public void setFactionList(List<Faction> factionList) {
+		this.factionList = factionList;
+	}
+	
 }

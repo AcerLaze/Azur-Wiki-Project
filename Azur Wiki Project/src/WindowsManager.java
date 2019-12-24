@@ -27,31 +27,40 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-public class WindowsManager {
+public class WindowsManager extends JFrame{
 	
-	private static JFrame frame;
+	WindowsManager(){
+		
+		setLayout(null);
+		
+		setUndecorated(false);
+		
+		setPreferredSize(new Dimension(1500, 880));
+		
+		setResizable(false);
+		
+		pack();
+		
+		setVisible(true);
+		
+		
+	}
 	
-	public static void ship_detail_window(Ship ship) {
+	public void ship_detail_window(Ship ship) {
 		
 		if(ship == null) return;
-		
-		frame = new JFrame();
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(null);
-		frame.setPreferredSize(new Dimension(1500, 880));
-		//frame.setResizable(false);
-		frame.setUndecorated(false);
 		
 		JPanel panel = new JPanel();
 		
 		panel.setLayout(new BorderLayout());
 		
 		panel.add(ship_detail_sidebar_window(ship), BorderLayout.WEST);
+		
 		panel.add(ship_detail_main_window(ship), BorderLayout.CENTER);
 		
 		panel.setBounds(0, 0, 1500, 870);
 		panel.setBackground(new Color(0, 0, 0, 0));
-		frame.add(panel);
+		add(panel);
 	
 		try {
 			
@@ -63,19 +72,20 @@ public class WindowsManager {
 			bakcground_label.setBounds(0, 0, 1511, 850);
 			bakcground_label.setPreferredSize(new Dimension(1000, 850));
 			
-			frame.add(bakcground_label);
+			add(bakcground_label);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		frame.pack();
-		frame.setVisible(true);
+		pack();
+		
+		repaint();
 		
 	}
 	
-	private static JPanel ship_detail_sidebar_window(Ship ship) {
+	private JPanel ship_detail_sidebar_window(Ship ship) {
 	
 		Color panel_background = new Color(0, 0, 0, 100);
 		
@@ -196,7 +206,7 @@ public class WindowsManager {
 		sub_panel.add(ship_class, g);
 		
 		JLabel faction_label = new JLabel("Faction", SwingConstants.CENTER);
-		JLabel faction = new JLabel(ship.getFaction(), SwingConstants.CENTER);
+		JLabel faction = new JLabel(ship.getFaction().getName(), SwingConstants.CENTER);
 		
 		faction_label.setBorder(border);
 		faction.setBorder(border);
@@ -211,7 +221,7 @@ public class WindowsManager {
 		faction_label.setOpaque(true);
 		
 		faction.setOpaque(true);
-		faction.setBackground(ship.getFactionColor());
+		faction.setBackground(ship.getFaction().getFactionColor());
 		
 		g.gridx = 0; g.gridy = 3;
 		sub_panel.add(faction_label, g);
@@ -230,7 +240,7 @@ public class WindowsManager {
 		
 	}
 	
-	private static JPanel ship_detail_main_window(Ship ship) {
+	private JPanel ship_detail_main_window(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(0, 0, 0, 0));
@@ -257,61 +267,82 @@ public class WindowsManager {
 		
 		main_panel.setBackground(new Color(0, 0, 0, 0));
 		
-		JScrollPane main_scroll_panel = new JScrollPane();
-		main_scroll_panel.setPreferredSize(new Dimension(770, 730));
-		
-		main_scroll_panel.setOpaque(false);
-		
-		main_scroll_panel.setViewportView(ship_detail_main_scroll_page(ship));
-		main_scroll_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		main_scroll_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		main_scroll_panel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
-			
-			@Override
-			public void adjustmentValueChanged(AdjustmentEvent arg0) {
-				// TODO Auto-generated method stub
-				
-				frame.repaint();
-				
-			}
-		});
-		
-		main_scroll_panel.getViewport().setOpaque(false);
-		main_scroll_panel.getViewport().setBackground(new Color(0, 0, 0, 0));
-		main_scroll_panel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
-		
-		main_scroll_panel.setBackground(new Color(0, 0, 0, 0));
-		
-		JPanel faction_banner = new JPanel();
-		faction_banner.setLayout(new BoxLayout(faction_banner, BoxLayout.Y_AXIS));
-		faction_banner.setBackground(ship.getFactionColor());
-		faction_banner.setPreferredSize(new Dimension(285, 730));
-		
-		JLabel faction_title = new JLabel("<html><body style='text-align: center'>" + ship.getFaction() + "</body></html>", JLabel.CENTER);
-		faction_title.setFont(new Font("Serif", Font.BOLD, 40));
-		faction_title.setPreferredSize(new Dimension(270, 50));
-		faction_title.setForeground(Color.black);
-		faction_title.setAlignmentX(Component.CENTER_ALIGNMENT);
-		faction_title.setOpaque(true);
-		faction_title.setBackground(null);
-		faction_title.setBorder(new EmptyBorder(100, 10, 10, 10));
-		
-		faction_banner.add(faction_title);
-		faction_banner.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
-		main_panel.add(main_scroll_panel);
-		main_panel.add(faction_banner);
-		
 		sub_panel.add(header);
-		sub_panel.add(main_panel);
 		
+		if(!ship.getRarity().contentEquals("Unreleased")) {
+
+			JScrollPane main_scroll_panel = new JScrollPane();
+			main_scroll_panel.setPreferredSize(new Dimension(770, 730));
+			
+			main_scroll_panel.setOpaque(false);
+			
+			main_scroll_panel.setViewportView(ship_detail_main_scroll_page(ship));
+			main_scroll_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			main_scroll_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			main_scroll_panel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+				
+				@Override
+				public void adjustmentValueChanged(AdjustmentEvent arg0) {
+					// TODO Auto-generated method stub
+					
+					repaint();
+					
+				}
+			});
+			
+			main_scroll_panel.getViewport().setOpaque(false);
+			main_scroll_panel.getViewport().setBackground(new Color(0, 0, 0, 0));
+			main_scroll_panel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
+			
+			main_scroll_panel.setBackground(new Color(0, 0, 0, 0));
+			
+			JPanel faction_banner = new JPanel();
+			faction_banner.setLayout(new BoxLayout(faction_banner, BoxLayout.Y_AXIS));
+			faction_banner.setBackground(ship.getFaction().getFactionColor());
+			faction_banner.setPreferredSize(new Dimension(285, 730));
+			
+			
+			if(ship.getFaction().getImg() != null) {
+				
+				JPanel image_container = new JPanel();
+			
+				JLabel image = new JLabel(new ImageIcon(ship.getFaction().getImg()), JLabel.CENTER);
+				image.setMaximumSize(new Dimension(100, 100));
+				image_container.add(image);
+				image_container.setMaximumSize(new Dimension(100, 100));
+				image_container.setBorder(new EmptyBorder(10, 10, 10, 10));
+				image.setBackground(null);
+				image_container.setBackground(null);
+			
+				faction_banner.add(image_container);
+			
+			}
+			
+			JLabel faction_title = new JLabel("<html><body style='text-align: center'>" + ship.getFaction().getName() + "</body></html>", JLabel.CENTER);
+			faction_title.setFont(new Font("Serif", Font.BOLD, 40));
+			faction_title.setPreferredSize(new Dimension(270, 50));
+			faction_title.setForeground(Color.black);
+			faction_title.setAlignmentX(Component.CENTER_ALIGNMENT);
+			faction_title.setOpaque(true);
+			faction_title.setBackground(null);
+			faction_title.setBorder(new EmptyBorder(10, 10, 10, 10));
+			
+			faction_banner.add(faction_title);
+			faction_banner.setBorder(new EmptyBorder(230, 10, 10, 10));
+			
+			main_panel.add(main_scroll_panel);
+			main_panel.add(faction_banner);
+			sub_panel.add(main_panel);
+			
+		}
+
 		panel.add(sub_panel);
 		
 		return panel;
 		
 	}
 	
-	private static JPanel ship_detail_main_scroll_page(Ship ship) {
+	private JPanel ship_detail_main_scroll_page(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		
@@ -426,7 +457,7 @@ public class WindowsManager {
 		
 	}
 	
-	private static JPanel stat_table(Ship ship) {
+	private JPanel stat_table(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		
@@ -674,7 +705,7 @@ public class WindowsManager {
 		
 	}
 	
-	private static JPanel skill_table(Ship ship) {
+	private JPanel skill_table(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		
@@ -702,9 +733,8 @@ public class WindowsManager {
 				skill_title.setPreferredSize(new Dimension(100, 100));
 				skill_title.setOpaque(true);
 				skill_title.setBackground(skill.getSkillColor());
-				System.out.println(skill.getName());
 				skill_title.setAlignmentX(Component.CENTER_ALIGNMENT);
-				skill_title.setFont(new Font(skill_title.getFont().getFontName(), Font.BOLD, 20));
+				skill_title.setFont(new Font(skill_title.getFont().getFontName(), Font.BOLD, 15));
 				skill_title_container.add(skill_title);
 				skill_title_container.setMaximumSize(new Dimension(110, 110));
 				
@@ -737,7 +767,7 @@ public class WindowsManager {
 		
 	}
 	
-	private static JPanel equipment_table(Ship ship) {
+	private JPanel equipment_table(Ship ship) {
 		
 		JPanel panel = new JPanel();
 		

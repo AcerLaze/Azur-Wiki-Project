@@ -7,9 +7,11 @@ public class Run {
 
 	private int system_mod = 0;
 	private boolean console_mode = true;
+	private WindowsManager window;
 	
 	Run(){
 		//For debugging just change system_mod to 1 and don't forget to change it back ( O w O )
+		
 		if(system_mod == 0) mainRun();
 		else if (system_mod == 1) debug();
 		
@@ -41,13 +43,15 @@ public class Run {
 	
 	private void run_windows(Ship ship) {
 		
+		window = new WindowsManager();
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				
-				WindowsManager.ship_detail_window(ship);
+				window.ship_detail_window(ship);
 				
 			}
 		});
@@ -214,7 +218,7 @@ public class Run {
 										if(!ship.isDownloaded()) ship.getData();
 										
 										System.out.println("Name      : " + ship.getName());
-										System.out.println("Faction   : " + ship.getFaction());
+										System.out.println("Faction   : " + ship.getFaction().getName());
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
@@ -249,7 +253,7 @@ public class Run {
 										if(!ship.isDownloaded()) ship.getData();
 										
 										System.out.println("Name      : " + ship.getName());
-										System.out.println("Faction   : " + ship.getFaction());
+										System.out.println("Faction   : " + ship.getFaction().getName());
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
@@ -272,7 +276,7 @@ public class Run {
 										if(!ship.isDownloaded()) ship.getData();
 										
 										System.out.println("Name      : " + ship.getName());
-										System.out.println("Faction   : " + ship.getFaction());
+										System.out.println("Faction   : " + ship.getFaction().getName());
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
@@ -321,8 +325,18 @@ public class Run {
 	
 	private void debug() {
 		
-//		WebAdapter webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
-//		ShipContainer container = webAdapter.requestShipList();
+		WebAdapter webAdapter;
+		
+		try {
+			
+			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
+			ShipContainer ship = webAdapter.requestShipList();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
 //
 //		for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
 //			

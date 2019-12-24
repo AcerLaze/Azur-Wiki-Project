@@ -19,7 +19,7 @@ public class Ship {
 	private String name;
 	private String rarity;
 	private String type;
-	private String faction;
+	private Faction faction;
 	private String armour_type;
 	private String ship_class;
 	private String construction_time;
@@ -71,7 +71,7 @@ public class Ship {
 		
 	}
 	
-	public Ship(String id, String name, String rarity, String type, String faction, String link, int ship_type) {
+	public Ship(String id, String name, String rarity, String type, Faction faction, String link, int ship_type) {
 		
 		this.id = id;
 		this.name = name;
@@ -274,7 +274,7 @@ public class Ship {
 		switch (type) {
 		case "Faction":
 			
-			return new Color(getFactionColor().getRed(), getFactionColor().getGreen(), getFactionColor().getBlue(), (int)(255 * opacity));
+			return new Color(faction.getFactionColor().getRed(), faction.getFactionColor().getGreen(), faction.getFactionColor().getBlue(), (int)(255 * opacity));
 
 		case "Rarity":
 			
@@ -293,66 +293,7 @@ public class Ship {
 		
 	}
 	
-	public Color getFactionColor() {
-		
-		Color background;
-		
-		switch (faction) {
-		case "Eagle Union":
-			
-			background = new Color(176, 224, 230);
-			
-			break;
-			
-		case "Eastern Radiance":
-			
-			background = new Color(221, 160, 221);
-			
-			break;
-			
-		case "Iris Libre":
-			
-			background = new Color(255, 215, 0);
-			
-			break;
-			
-		case "Ironblood":
-			
-			background = new Color(255, 192, 203);
-			
-			break;
-			
-		case "Royal Navy":
-			
-			background = new Color(131, 170, 240);
-			
-			break;
-			
-		case "Sakura Empire":
-			
-			background = new Color(255, 240, 245);
-			
-			break;
-			
-		case "Sardegna Empire":
-			
-			background = new Color(110, 190, 147);
-			
-			break;
-			
-		case "Vichya Dominion":
-			
-			background = new Color(215, 124, 124);
-			
-			break;
-		default:
-			background = new Color(220, 220, 220);	
-
-		}
-		
-		return background;
-		
-	}
+	
 	
 	public Color getRarityColor() {
 
@@ -556,11 +497,11 @@ public class Ship {
 		this.type = type;
 	}
 
-	public String getFaction() {
+	public Faction getFaction() {
 		return faction;
 	}
 
-	public void setFaction(String faction) {
+	public void setFaction(Faction faction) {
 		this.faction = faction;
 	}
 

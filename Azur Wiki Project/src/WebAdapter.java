@@ -1,5 +1,9 @@
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +24,11 @@ public class WebAdapter {
 	private Elements Ship_List;
 	private Elements Ship_Details;
 	private Elements Ship_Image;
+	private Elements Faction_List;
 	
 	final static public int SHIP_LIST = 0;
 	final static public int SHIP_DETAIL = 1;
+	final static public int FACTION = 2;
 	
 	
 	WebAdapter(String url, int type) throws Exception{
@@ -31,7 +37,6 @@ public class WebAdapter {
 		
 		Connection connection = Jsoup.connect(url);
 		
-
 		connection.timeout(12000);
 			
 		Ship_Page = Jsoup.connect(url).timeout(12000).get();
@@ -42,6 +47,10 @@ public class WebAdapter {
 			Ship_Details = Ship_Page.select("table.wikitable");
 			Ship_Image = Ship_Page.select("div.adaptiveratioimg");
 				
+		} else if (type == FACTION) {
+			
+			Faction_List = Ship_Page.select("table.wikitable");
+			
 		}
 		
 	}
@@ -58,78 +67,136 @@ public class WebAdapter {
 		
 		ShipContainer shipList = new ShipContainer();
 		
-		Element Normal_Ship = Ship_List.get(0);
-		Element Priority_Ship = Ship_List.get(1);
-		Element Collab_Ship = Ship_List.get(2);
+		WebAdapter webAdapter;
+		List<Faction> factions;
 		
-		for (Element element : Normal_Ship.select("tr")) {
+		try {
 			
-			Elements ShipData = element.select("td");
+			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/Nations", WebAdapter.FACTION);
+			factions = webAdapter.getFactions();
 			
-			if(ShipData.size() < 1) continue;
+			shipList.setFactionList(factions);
 			
-			Elements links = ShipData.select("a");
-			String link = links.get(1).attr("href");
+			Element Normal_Ship = Ship_List.get(0);
+			Element Priority_Ship = Ship_List.get(1);
+			Element Collab_Ship = Ship_List.get(2);
 			
-			Ship ship = new Ship(ShipData.get(0).text(), 
-					    ShipData.get(1).text(),
-					    ShipData.get(2).text(), 
-					    ShipData.get(3).text(),
-					    ShipData.get(4).text(),
-						"https://azurlane.koumakan.jp" + link, ShipContainer.NORMAL_SHIP);
+			for (Element element : Normal_Ship.select("tr")) {
+				
+				Elements ShipData = element.select("td");
+				
+				if(ShipData.size() < 1) continue;
+				
+				Elements links = ShipData.select("a");
+				String link = links.get(1).attr("href");
+				
+				Faction faction = null;
+				
+				for (Faction e : factions) {
+					
+					if(e.getName().contentEquals(ShipData.get(4).text())) {
+					
+						faction = e;
+						
+						break;
+						
+					}
+					
+				}
+				
+				Ship ship = new Ship(ShipData.get(0).text(), 
+						    ShipData.get(1).text(),
+						    ShipData.get(2).text(), 
+						    ShipData.get(3).text(),
+						    faction,
+							"https://azurlane.koumakan.jp" + link, ShipContainer.NORMAL_SHIP);
+				
+				shipList.addShip(ShipContainer.NORMAL_SHIP, ship);
+				//System.out.println(ShipData.get(1).text() + " data downloaded!");
+				
+			}
 			
-			shipList.addShip(ShipContainer.NORMAL_SHIP, ship);
-			//System.out.println(ShipData.get(1).text() + " data downloaded!");
+			System.out.println(" > Normal Ship Download Success");
 			
+			for (Element element : Priority_Ship.select("tr")) {
+				
+				Elements ShipData = element.select("td");
+				
+				if(ShipData.size() < 1) continue;
+				
+				Elements links = ShipData.select("a");
+				String link = links.get(1).attr("href");
+				
+				Faction faction = null;
+				
+				for (Faction e : factions) {
+					
+					if(e.getName().contentEquals(ShipData.get(4).text())) {
+						
+						faction = e;
+						
+						break;
+						
+					}
+					
+				}
+				
+				shipList.addShip(ShipContainer.PRIORITY_SHIP, new Ship(ShipData.get(0).text(), 
+									  						  ShipData.get(1).text(),
+									  						  ShipData.get(2).text(),
+									  						  ShipData.get(3).text(),
+									  						  faction,
+									  						  "https://azurlane.koumakan.jp" + link, ShipContainer.PRIORITY_SHIP));
+				//System.out.println(ShipData.get(1).text() + " data downloaded!");
+			}
+			
+			System.out.println(" > Priority Ship Download Success");
+			
+			for (Element element : Collab_Ship.select("tr")) {
+				
+				Elements ShipData = element.select("td");
+				
+				if(ShipData.size() < 1) continue;
+				
+				Elements links = ShipData.select("a");
+				String link = links.get(1).attr("href");
+				
+				Faction faction = null;
+				
+				for (Faction e : factions) {
+					
+					if(e.getName().contentEquals(ShipData.get(4).text())) {
+						
+						faction = e;
+						
+						break;
+						
+					}
+					
+				}
+				
+				shipList.addShip(ShipContainer.COLLAB_SHIP, new Ship(ShipData.get(0).text(), 
+									  			    		ShipData.get(1).text(), 
+									  			    		ShipData.get(2).text(), 
+									  			    		ShipData.get(3).text(),
+									  					    faction,
+									  			    		"https://azurlane.koumakan.jp" + link, ShipContainer.COLLAB_SHIP));
+				//System.out.println(ShipData.get(1).text() + " data downloaded!");
+			}
+			
+			System.out.println(" > Collab Ship Download Success");
+			
+			shipList.calculateAvg();
+			
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		
-		System.out.println("Normal Ship Download Success");
-		
-		for (Element element : Priority_Ship.select("tr")) {
-			
-			Elements ShipData = element.select("td");
-			
-			if(ShipData.size() < 1) continue;
-			
-			Elements links = ShipData.select("a");
-			String link = links.get(1).attr("href");
-			
-			shipList.addShip(ShipContainer.PRIORITY_SHIP, new Ship(ShipData.get(0).text(), 
-								  						  ShipData.get(1).text(),
-								  						  ShipData.get(2).text(),
-								  						  ShipData.get(3).text(),
-								  						  ShipData.get(4).text(),
-								  						  "https://azurlane.koumakan.jp" + link, ShipContainer.PRIORITY_SHIP));
-			//System.out.println(ShipData.get(1).text() + " data downloaded!");
-		}
-		
-		System.out.println("Priority Ship Download Success");
-		
-		for (Element element : Collab_Ship.select("tr")) {
-			
-			Elements ShipData = element.select("td");
-			
-			if(ShipData.size() < 1) continue;
-			
-			Elements links = ShipData.select("a");
-			String link = links.get(1).attr("href");
-			
-			shipList.addShip(ShipContainer.COLLAB_SHIP, new Ship(ShipData.get(0).text(), 
-								  			    		ShipData.get(1).text(), 
-								  			    		ShipData.get(2).text(), 
-								  			    		ShipData.get(3).text(),
-								  					    ShipData.get(4).text(),
-								  			    		"https://azurlane.koumakan.jp" + link, ShipContainer.COLLAB_SHIP));
-			//System.out.println(ShipData.get(1).text() + " data downloaded!");
-		}
-		
-		System.out.println("Collab Ship Download Success");
-		
-		shipList.calculateAvg();
 		
 		return shipList;
 		
 	}
+	
 	
 	public List<Skill> requestShipSkill() {
 		
@@ -148,7 +215,7 @@ public class WebAdapter {
 			String desc = row.get(2).text();
 				
 			if(name.isEmpty()) break;
-			else name = name.substring(0, name.indexOf("C"));
+			else name = name.substring(0, name.indexOf("CN:"));
 				
 			String style = row.get(1).attr("style");
 			int type;
@@ -166,6 +233,7 @@ public class WebAdapter {
 		return skills;
 		
 	}
+	
 	
 	public List<Equipment> requestShipEquipment() {
 		//Returning available equipment from wiki in form of List
@@ -192,6 +260,7 @@ public class WebAdapter {
 		
 	}
 	
+	
 	public boolean requestIsShipRetrofitable() {
 		//Checking if a ship can be retrofit by checking with the website
 		try {
@@ -213,6 +282,7 @@ public class WebAdapter {
 		return false;
 		
 	}
+	
 	
 	public void getShipStat(Ship ship) {
 		//Not the best method to extract ship status but it's more convenient
@@ -266,6 +336,7 @@ public class WebAdapter {
 		
 	}
 
+	
 	public String requestConstructionTime() {
 		// TODO Auto-generated method stub
 		//Getting the ship status
@@ -277,6 +348,7 @@ public class WebAdapter {
 		
 	}
 
+	
 	public String requestClass() {
 		// TODO Auto-generated method stub
 		//Get ship class
@@ -288,6 +360,7 @@ public class WebAdapter {
 		
 	}
 
+	
 	public List<String> getImage() {
 		//Fetch all available skin available by saving link in a list
 		List<String> links = new ArrayList<String>();
@@ -309,6 +382,7 @@ public class WebAdapter {
 		
 	}
 
+	
 	public Image getIcon(String name) throws Exception{
 		
 		Image img = null;
@@ -322,6 +396,69 @@ public class WebAdapter {
 		img = ImageIO.read(new URL(link));
 		
 		return img;
+		
+	}
+	
+	public List<Faction> getFactions(){
+		
+		System.out.println(" > Getting faction list");
+		List<Faction> factions = new ArrayList<Faction>();
+		
+		factions.add(new Faction("Universal", null));
+		
+		for (Element e : Faction_List.select("tr")) {
+			
+			Elements row = e.select("td");
+			
+			if(row.size() < 4) continue;
+			
+			String name = row.get(0).text();
+			
+			String link = row.get(3).select("img").attr("srcset");
+			link = link.substring(0, link.length() - 3);
+			
+			while(link.contains(", ")) {
+				
+				link = link.substring(link.indexOf(", ")).substring(2);
+				
+			}
+			
+			Image img = null;
+			String directory = "Source/Faction/" + name + ".png";
+			
+			try {
+				
+				img = ImageIO.read(new File(directory));
+				
+			} catch (Exception e2) {
+				// TODO: handle exception
+				
+				System.out.println(" > Failed to get image from " + directory);
+				
+				try {
+					img = ImageIO.read(new URL("https://azurlane.koumakan.jp" + link));
+					
+					new File("Source/Faction/").mkdirs();
+					
+					ImageIO.write((BufferedImage) img, "png", new File(directory));
+					
+				} catch (MalformedURLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+			
+			
+			
+			factions.add(new Faction(name, img));
+			
+		}
+		
+		return factions;
 		
 	}
 	
