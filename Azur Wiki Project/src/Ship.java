@@ -87,19 +87,9 @@ public class Ship {
 	public void getData() {
 		
 		WebAdapter web_adapter;
-		
-		try {
-			
-			web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			
-			return;
-			
-		}
-		
-		
+
+		web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
+
 		if(!rarity.contentEquals("Unreleased")) {
 			//If the ship is unrelease, dont bother to fetch more data or it will cause error
 			retrofitable = web_adapter.requestIsShipRetrofitable();
@@ -132,15 +122,17 @@ public class Ship {
 				
 			}
 			
-			skills = web_adapter.requestShipSkill();
-			equipments = web_adapter.requestShipEquipment();
+			skills = web_adapter.requestShipSkill(id);
 			
-			construction_time = web_adapter.requestConstructionTime();
-			ship_class = web_adapter.requestClass();
+			equipments = web_adapter.requestShipEquipment(id);
+			
+			construction_time = web_adapter.requestConstructionTime(id);
+			
+			ship_class = web_adapter.requestClass(id);
 			
 			image = new ArrayList<Image>();
 			
-			for (String url : web_adapter.getImage()) {
+			for (String url : web_adapter.getImage(id)) {
 			
 				Image img = null;
 				
@@ -292,8 +284,6 @@ public class Ship {
 		
 		
 	}
-	
-	
 	
 	public Color getRarityColor() {
 
@@ -745,6 +735,14 @@ public class Ship {
 
 	public void setDownloaded(boolean downloaded) {
 		this.downloaded = downloaded;
+	}
+
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
 	}
 	
 }

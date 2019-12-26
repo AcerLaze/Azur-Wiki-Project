@@ -31,16 +31,23 @@ public class WebAdapter {
 	final static public int FACTION = 2;
 	
 	
-	WebAdapter(String url, int type) throws Exception{
+	WebAdapter(String url, int type) {
 		
 		mod = 0;
 		
-		Connection connection = Jsoup.connect(url);
+		try {
+			
+			Ship_Page = null;//Jsoup.connect(url).timeout(12000).get();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			
+			Ship_Page = null;
+			
+		}
 		
-		connection.timeout(12000);
-			
-		Ship_Page = Jsoup.connect(url).timeout(12000).get();
-			
+		if(Ship_Page == null) return;
+		
 		if(type == SHIP_LIST) Ship_List = Ship_Page.select("table.wikitable.sortable.jquery-tablesorter");
 		else if(type == SHIP_DETAIL) {
 				
@@ -58,208 +65,268 @@ public class WebAdapter {
 	public ShipContainer requestShipList(){
 		//Fetching all available ship from wiki
 		
-		if(Ship_Page == null) {
-			
-			System.out.println("Can't connect to the server !");
-			return null;
-			
-		}
-		
-		ShipContainer shipList = new ShipContainer();
-		
 		WebAdapter webAdapter;
 		List<Faction> factions;
 		
-		try {
+		ShipContainer shipList = new ShipContainer();;
+		
+		webAdapter = new WebAdapter("https://azurlane.koumakan.jp/Nations", WebAdapter.FACTION);
+		factions = webAdapter.getFactions();
 			
-			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/Nations", WebAdapter.FACTION);
-			factions = webAdapter.getFactions();
+		shipList.setFactionList(factions);
+		
+		if(Ship_Page == null) {
 			
-			shipList.setFactionList(factions);
+			System.out.println("Can't connect to the server !");
 			
-			Element Normal_Ship = Ship_List.get(0);
-			Element Priority_Ship = Ship_List.get(1);
-			Element Collab_Ship = Ship_List.get(2);
+			List<Ship> normalShip = DatabaseAdapter.getShip(ShipContainer.NORMAL_SHIP, shipList);
 			
-			for (Element element : Normal_Ship.select("tr")) {
-				
-				Elements ShipData = element.select("td");
-				
-				if(ShipData.size() < 1) continue;
-				
-				Elements links = ShipData.select("a");
-				String link = links.get(1).attr("href");
-				
-				Faction faction = null;
-				
-				for (Faction e : factions) {
-					
-					if(e.getName().contentEquals(ShipData.get(4).text())) {
-					
-						faction = e;
-						
-						break;
-						
-					}
-					
-				}
-				
-				Ship ship = new Ship(ShipData.get(0).text(), 
-						    ShipData.get(1).text(),
-						    ShipData.get(2).text(), 
-						    ShipData.get(3).text(),
-						    faction,
-							"https://azurlane.koumakan.jp" + link, ShipContainer.NORMAL_SHIP);
+			for (Ship ship : normalShip) {
 				
 				shipList.addShip(ShipContainer.NORMAL_SHIP, ship);
-				//System.out.println(ShipData.get(1).text() + " data downloaded!");
 				
 			}
 			
-			System.out.println(" > Normal Ship Download Success");
+			System.out.println(" > Normal Ship load Success");
 			
-			for (Element element : Priority_Ship.select("tr")) {
+			List<Ship> priorityShip = DatabaseAdapter.getShip(ShipContainer.PRIORITY_SHIP, shipList);
+			
+			for (Ship ship : priorityShip) {
 				
-				Elements ShipData = element.select("td");
+				shipList.addShip(ShipContainer.PRIORITY_SHIP, ship);
 				
-				if(ShipData.size() < 1) continue;
+			}
+			
+			System.out.println(" > Priority Ship load Success");
+			
+			List<Ship> collabShip = DatabaseAdapter.getShip(ShipContainer.COLLAB_SHIP, shipList);
+			
+			for (Ship ship : collabShip) {
 				
-				Elements links = ShipData.select("a");
-				String link = links.get(1).attr("href");
+				shipList.addShip(ShipContainer.COLLAB_SHIP, ship);
 				
-				Faction faction = null;
+			}
+			
+			System.out.println(" > Collab Ship load Success");
+			
+		} else {
+			
+			try {
 				
-				for (Faction e : factions) {
+				Element Normal_Ship = Ship_List.get(0);
+				Element Priority_Ship = Ship_List.get(1);
+				Element Collab_Ship = Ship_List.get(2);
+				
+				for (Element element : Normal_Ship.select("tr")) {
 					
-					if(e.getName().contentEquals(ShipData.get(4).text())) {
+					Elements ShipData = element.select("td");
+					
+					if(ShipData.size() < 1) continue;
+					
+					Elements links = ShipData.select("a");
+					String link = links.get(1).attr("href");
+					
+					Faction faction = null;
+					
+					for (Faction e : factions) {
 						
-						faction = e;
+						if(e.getName().contentEquals(ShipData.get(4).text())) {
 						
-						break;
+							faction = e;
+							
+							break;
+							
+						}
 						
 					}
 					
+					Ship ship = new Ship(ShipData.get(0).text(), 
+							    ShipData.get(1).text(),
+							    ShipData.get(2).text(), 
+							    ShipData.get(3).text(),
+							    faction,
+								"https://azurlane.koumakan.jp" + link, ShipContainer.NORMAL_SHIP);
+					
+					DatabaseAdapter.saveMinData(ship);
+					shipList.addShip(ShipContainer.NORMAL_SHIP, ship);
+					//System.out.println(ShipData.get(1).text() + " data downloaded!");
+					
 				}
 				
-				shipList.addShip(ShipContainer.PRIORITY_SHIP, new Ship(ShipData.get(0).text(), 
-									  						  ShipData.get(1).text(),
-									  						  ShipData.get(2).text(),
-									  						  ShipData.get(3).text(),
-									  						  faction,
-									  						  "https://azurlane.koumakan.jp" + link, ShipContainer.PRIORITY_SHIP));
-				//System.out.println(ShipData.get(1).text() + " data downloaded!");
-			}
-			
-			System.out.println(" > Priority Ship Download Success");
-			
-			for (Element element : Collab_Ship.select("tr")) {
+				System.out.println(" > Normal Ship Download Success");
 				
-				Elements ShipData = element.select("td");
-				
-				if(ShipData.size() < 1) continue;
-				
-				Elements links = ShipData.select("a");
-				String link = links.get(1).attr("href");
-				
-				Faction faction = null;
-				
-				for (Faction e : factions) {
+				for (Element element : Priority_Ship.select("tr")) {
 					
-					if(e.getName().contentEquals(ShipData.get(4).text())) {
+					Elements ShipData = element.select("td");
+					
+					if(ShipData.size() < 1) continue;
+					
+					Elements links = ShipData.select("a");
+					String link = links.get(1).attr("href");
+					
+					Faction faction = null;
+					
+					for (Faction e : factions) {
 						
-						faction = e;
-						
-						break;
+						if(e.getName().contentEquals(ShipData.get(4).text())) {
+							
+							faction = e;
+							
+							break;
+							
+						}
 						
 					}
 					
+					Ship ship = new Ship(ShipData.get(0).text(), 
+							  ShipData.get(1).text(),
+							  ShipData.get(2).text(),
+							  ShipData.get(3).text(),
+							  faction,
+							  "https://azurlane.koumakan.jp" + link, ShipContainer.PRIORITY_SHIP);
+					
+					DatabaseAdapter.saveMinData(ship);
+					
+					shipList.addShip(ShipContainer.PRIORITY_SHIP, ship);
+					//System.out.println(ShipData.get(1).text() + " data downloaded!");
 				}
 				
-				shipList.addShip(ShipContainer.COLLAB_SHIP, new Ship(ShipData.get(0).text(), 
-									  			    		ShipData.get(1).text(), 
-									  			    		ShipData.get(2).text(), 
-									  			    		ShipData.get(3).text(),
-									  					    faction,
-									  			    		"https://azurlane.koumakan.jp" + link, ShipContainer.COLLAB_SHIP));
-				//System.out.println(ShipData.get(1).text() + " data downloaded!");
+				System.out.println(" > Priority Ship Download Success");
+				
+				for (Element element : Collab_Ship.select("tr")) {
+					
+					Elements ShipData = element.select("td");
+					
+					if(ShipData.size() < 1) continue;
+					
+					Elements links = ShipData.select("a");
+					String link = links.get(1).attr("href");
+					
+					Faction faction = null;
+					
+					for (Faction e : factions) {
+						
+						if(e.getName().contentEquals(ShipData.get(4).text())) {
+							
+							faction = e;
+							
+							break;
+							
+						}
+						
+					}
+					
+					Ship ship = new Ship(ShipData.get(0).text(), 
+	  			    		ShipData.get(1).text(), 
+	  			    		ShipData.get(2).text(), 
+	  			    		ShipData.get(3).text(),
+	  					    faction,
+	  			    		"https://azurlane.koumakan.jp" + link, ShipContainer.COLLAB_SHIP);
+					
+					DatabaseAdapter.saveMinData(ship);
+					
+					shipList.addShip(ShipContainer.COLLAB_SHIP, ship);
+					//System.out.println(ShipData.get(1).text() + " data downloaded!");
+				}
+				
+				System.out.println(" > Collab Ship Download Success");
+				
+				
+				
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 			
-			System.out.println(" > Collab Ship Download Success");
-			
-			shipList.calculateAvg();
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
+		
+		shipList.calculateAvg();
 		
 		return shipList;
 		
 	}
 	
 	
-	public List<Skill> requestShipSkill() {
+	public List<Skill> requestShipSkill(String shipID) {
 		
-		//Returning all available Skill from wiki in form of List
 		List<Skill> skills = new ArrayList<>();
+		
+		if(Ship_Page == null) {
 			
-		Element skill_table = Ship_Details.get(9 + mod);
+			skills = DatabaseAdapter.getSkills(shipID);
 			
-		for (Element element : skill_table.select("tr")) {
-				
-			Elements row = element.select("td");
-				
-			if(row.size() != 3) continue;
-				
-			String name = row.get(1).text();
-			String desc = row.get(2).text();
-				
-			if(name.isEmpty()) break;
-			else name = name.substring(0, name.indexOf("CN:"));
-				
-			String style = row.get(1).attr("style");
-			int type;
-				
-			if(style.contains("Gold")) type = Skill.SUPPORT;
-			else if(style.contains("Pink")) type = Skill.ASSAULT;
-			else if(style.contains("Blue")) type = Skill.DEFENSE;
-			else type = -1;
-				
-			skills.add(new Skill(name, desc, type));
-				
-				
+		} else {
+			
+			//Returning all available Skill from wiki in form of List
+			Element skill_table = Ship_Details.get(9 + mod);
+			
+			for (Element element : skill_table.select("tr")) {
+					
+				Elements row = element.select("td");
+					
+				if(row.size() != 3) continue;
+					
+				String name = row.get(1).text();
+				String desc = row.get(2).text();
+					
+				if(name.isEmpty()) break;
+				else name = name.substring(0, name.indexOf(" CN:"));
+					
+				String style = row.get(1).attr("style");
+				int type;
+					
+				if(style.contains("Gold")) type = Skill.SUPPORT;
+				else if(style.contains("Pink")) type = Skill.ASSAULT;
+				else if(style.contains("Blue")) type = Skill.DEFENSE;
+				else type = -1;
+					
+				skills.add(new Skill(name, desc, type));
+			
+			}
+			
+			DatabaseAdapter.saveSkill(skills, shipID);
+			
 		}
-			
+
 		return skills;
 		
 	}
 	
 	
-	public List<Equipment> requestShipEquipment() {
+	public List<Equipment> requestShipEquipment(String shipId) {
 		//Returning available equipment from wiki in form of List
 		List<Equipment> equipments = new ArrayList<>();
 		
-		Element equipment_table = Ship_Details.get(6 + mod);
-				
-		for (Element element : equipment_table.select("tr")) {
-				
-			Elements row = element.select("td");
-				
-			if(row.size() < 3) continue;
-				
-			String equipment_efficiency = row.get(1).text();
-			String equipment_name = row.get(2).text();
-				
-			if(!equipment_efficiency.contentEquals("None")) equipment_efficiency = equipment_efficiency.split(" ")[2];
+		if(Ship_Page == null) {
 			
-			equipments.add(new Equipment(equipment_efficiency, equipment_name));
+			equipments = DatabaseAdapter.getEquipments(shipId);
+			
+		} else {
+			
+			Element equipment_table = Ship_Details.get(6 + mod);
+			
+			for (Element element : equipment_table.select("tr")) {
+					
+				Elements row = element.select("td");
+					
+				if(row.size() < 3) continue;
+					
+				String equipment_efficiency = row.get(1).text();
+				String equipment_name = row.get(2).text();
+					
+				if(!equipment_efficiency.contentEquals("None")) equipment_efficiency = equipment_efficiency.split(" ")[2];
+				
+				equipments.add(new Equipment(equipment_efficiency, equipment_name));
+				
+			}
+			
+			DatabaseAdapter.saveEquipment(equipments, shipId);
 			
 		}
-
+		
 		return equipments;
 		
 	}
-	
 	
 	public boolean requestIsShipRetrofitable() {
 		//Checking if a ship can be retrofit by checking with the website
@@ -283,98 +350,146 @@ public class WebAdapter {
 		
 	}
 	
-	
 	public void getShipStat(Ship ship) {
 		//Not the best method to extract ship status but it's more convenient
 		
-		Element table;
-		
-		if(ship.isRetrofitable()) {
+		if(Ship_Page == null) {
 			
-			table = Ship_Details.get(4);
+			DatabaseAdapter.getDetails(ship);
 			
-		} else table = Ship_Details.get(3);
-		
-		Elements row = table.select("tr");
-		
-		ship.setHealth(Integer.parseInt(row.get(0).select("td").get(0).text()));
-		ship.setArmour_type(row.get(0).select("td").get(1).text());
-		ship.setReload(Integer.parseInt(row.get(0).select("td").get(2).text()));
-		ship.setLuck(Integer.parseInt(row.get(0).select("td").get(3).text()));
-		
-		ship.setFirepower(Integer.parseInt(row.get(1).select("td").get(0).text()));
-		ship.setTorpedo(Integer.parseInt(row.get(1).select("td").get(1).text()));
-		ship.setEvasion(Integer.parseInt(row.get(1).select("td").get(2).text()));
-		ship.setSpeed(Integer.parseInt(row.get(1).select("td").get(3).text()));
-		
-		ship.setAnti_air(Integer.parseInt(row.get(2).select("td").get(0).text()));
-		ship.setAviation(Integer.parseInt(row.get(2).select("td").get(1).text()));
-		ship.setOil_consumtion(Integer.parseInt(row.get(2).select("td").get(2).text()));
-		ship.setAccuracy(Integer.parseInt(row.get(2).select("td").get(3).text()));
-		
-		ship.setAnti_submarine_warfare(Integer.parseInt(row.get(3).select("td").get(0).text()));
-		
-		if(ship.isRetrofitable()) {
+		} else {
 			
-			ship.setPost_retrofit_health(Integer.parseInt(row.get(0).select("td").get(0).text()));
-			ship.setPost_retrofit_reload(Integer.parseInt(row.get(0).select("td").get(2).text()));
-			ship.setPost_retrofit_luck(Integer.parseInt(row.get(0).select("td").get(3).text()));
+			Element table;
 			
-			ship.setPost_retrofit_firepower(Integer.parseInt(row.get(1).select("td").get(0).text()));
-			ship.setPost_retrofit_torpedo(Integer.parseInt(row.get(1).select("td").get(1).text()));
-			ship.setPost_retrofit_evasion(Integer.parseInt(row.get(1).select("td").get(2).text()));
-			ship.setPost_retrofit_speed(Integer.parseInt(row.get(1).select("td").get(3).text()));
+			if(ship.isRetrofitable()) {
+				
+				table = Ship_Details.get(4);
+				
+			} else table = Ship_Details.get(3);
 			
-			ship.setPost_retrofit_anti_air(Integer.parseInt(row.get(2).select("td").get(0).text()));
-			ship.setPost_retrofit_aviation(Integer.parseInt(row.get(2).select("td").get(1).text()));
-			ship.setPost_retrofit_oil_consumtion(Integer.parseInt(row.get(2).select("td").get(2).text()));
-			ship.setPost_retrofit_accuracy(Integer.parseInt(row.get(2).select("td").get(3).text()));
+			Elements row = table.select("tr");
 			
-			ship.setPost_retrofit_anti_submarine_warfare(Integer.parseInt(row.get(3).select("td").get(0).text()));
+			ship.setHealth(Integer.parseInt(row.get(0).select("td").get(0).text()));
+			ship.setArmour_type(row.get(0).select("td").get(1).text());
+			ship.setReload(Integer.parseInt(row.get(0).select("td").get(2).text()));
+			ship.setLuck(Integer.parseInt(row.get(0).select("td").get(3).text()));
+			
+			ship.setFirepower(Integer.parseInt(row.get(1).select("td").get(0).text()));
+			ship.setTorpedo(Integer.parseInt(row.get(1).select("td").get(1).text()));
+			ship.setEvasion(Integer.parseInt(row.get(1).select("td").get(2).text()));
+			ship.setSpeed(Integer.parseInt(row.get(1).select("td").get(3).text()));
+			
+			ship.setAnti_air(Integer.parseInt(row.get(2).select("td").get(0).text()));
+			ship.setAviation(Integer.parseInt(row.get(2).select("td").get(1).text()));
+			ship.setOil_consumtion(Integer.parseInt(row.get(2).select("td").get(2).text()));
+			ship.setAccuracy(Integer.parseInt(row.get(2).select("td").get(3).text()));
+			
+			ship.setAnti_submarine_warfare(Integer.parseInt(row.get(3).select("td").get(0).text()));
+			
+			if(ship.isRetrofitable()) {
+				
+				ship.setPost_retrofit_health(Integer.parseInt(row.get(0).select("td").get(0).text()));
+				ship.setPost_retrofit_reload(Integer.parseInt(row.get(0).select("td").get(2).text()));
+				ship.setPost_retrofit_luck(Integer.parseInt(row.get(0).select("td").get(3).text()));
+				
+				ship.setPost_retrofit_firepower(Integer.parseInt(row.get(1).select("td").get(0).text()));
+				ship.setPost_retrofit_torpedo(Integer.parseInt(row.get(1).select("td").get(1).text()));
+				ship.setPost_retrofit_evasion(Integer.parseInt(row.get(1).select("td").get(2).text()));
+				ship.setPost_retrofit_speed(Integer.parseInt(row.get(1).select("td").get(3).text()));
+				
+				ship.setPost_retrofit_anti_air(Integer.parseInt(row.get(2).select("td").get(0).text()));
+				ship.setPost_retrofit_aviation(Integer.parseInt(row.get(2).select("td").get(1).text()));
+				ship.setPost_retrofit_oil_consumtion(Integer.parseInt(row.get(2).select("td").get(2).text()));
+				ship.setPost_retrofit_accuracy(Integer.parseInt(row.get(2).select("td").get(3).text()));
+				
+				ship.setPost_retrofit_anti_submarine_warfare(Integer.parseInt(row.get(3).select("td").get(0).text()));
+				
+			}
+			
+			DatabaseAdapter.saveDetails(ship);
 			
 		}
 		
 	}
 
-	
-	public String requestConstructionTime() {
+	public String requestConstructionTime(String shipID) {
 		// TODO Auto-generated method stub
 		//Getting the ship status
-		Element table = Ship_Details.get(0);
 		
-		Elements row = table.select("tr");
+		String construction_time;
 		
-		return row.get(0).select("td").text();
+		if(Ship_Page == null) {
+			
+			construction_time = DatabaseAdapter.getConsTime(shipID);
+			
+		} else {
+			
+			Element table = Ship_Details.get(0);
+			
+			Elements row = table.select("tr");
+			
+			construction_time = row.get(0).select("td").text();
+			
+			DatabaseAdapter.saveConsTime(construction_time, shipID);
+			
+		}
+		
+		
+		return construction_time;
 		
 	}
 
-	
-	public String requestClass() {
+	public String requestClass(String shipID) {
 		// TODO Auto-generated method stub
 		//Get ship class
-		Element table = Ship_Details.get(0);
 		
-		Elements row = table.select("tr");
+		String shipClass;
 		
-		return row.get(2).select("td").text();
+		if(Ship_Page == null) {
+			
+			shipClass = DatabaseAdapter.getShipClass(shipID);
+			
+		} else {
+			
+			Element table = Ship_Details.get(0);
+			
+			Elements row = table.select("tr");
+			
+			shipClass = row.get(2).select("td").text();
+			
+			System.out.println(shipClass + shipID);
+			
+			DatabaseAdapter.saveShipClass(shipClass, shipID);
+			
+		}
+		
+		return shipClass;
 		
 	}
 
-	
-	public List<String> getImage() {
+	public List<String> getImage(String shipID) {
 		//Fetch all available skin available by saving link in a list
 		List<String> links = new ArrayList<String>();
 		
-		Elements image = Ship_Image.select("img");
+		if(Ship_Page == null) {
+			
+			links = DatabaseAdapter.getSkins(shipID);
+			
+		} else {
 		
-		for (Element element : image) {
+			Elements image = Ship_Image.select("img");
 			
-			String link = element.attr("srcset");
-			link = link.substring(0, link.indexOf(" "));
-			
-			links.add("https://azurlane.koumakan.jp" + link);
-			
-			//System.out.println("https://azurlane.koumakan.jp" + link);
+			for (Element element : image) {
+				
+				String link = element.attr("srcset");
+				link = "https://azurlane.koumakan.jp" + link.substring(0, link.indexOf(" "));
+				
+				DatabaseAdapter.saveSkin(link, shipID);
+				
+				links.add(link);
+				//System.out.println(link);
+				
+			}
 			
 		}
 		
@@ -402,60 +517,73 @@ public class WebAdapter {
 	public List<Faction> getFactions(){
 		
 		System.out.println(" > Getting faction list");
+		
 		List<Faction> factions = new ArrayList<Faction>();
 		
-		factions.add(new Faction("Universal", null));
+		if(Ship_Page == null) {
+			
+			//load from database 
+			System.out.println("Can't connect to the server !");
+			
+			factions = DatabaseAdapter.getFactions();
+			
+			
+		} else {
 		
-		for (Element e : Faction_List.select("tr")) {
+			factions.add(new Faction("Universal", null));
 			
-			Elements row = e.select("td");
-			
-			if(row.size() < 4) continue;
-			
-			String name = row.get(0).text();
-			
-			String link = row.get(3).select("img").attr("srcset");
-			link = link.substring(0, link.length() - 3);
-			
-			while(link.contains(", ")) {
+			for (Element e : Faction_List.select("tr")) {
 				
-				link = link.substring(link.indexOf(", ")).substring(2);
+				Elements row = e.select("td");
 				
-			}
-			
-			Image img = null;
-			String directory = "Source/Faction/" + name + ".png";
-			
-			try {
+				if(row.size() < 4) continue;
 				
-				img = ImageIO.read(new File(directory));
+				String name = row.get(0).text();
 				
-			} catch (Exception e2) {
-				// TODO: handle exception
+				String link = row.get(3).select("img").attr("srcset");
+				link = link.substring(0, link.length() - 3);
 				
-				System.out.println(" > Failed to get image from " + directory);
-				
-				try {
-					img = ImageIO.read(new URL("https://azurlane.koumakan.jp" + link));
+				while(link.contains(", ")) {
 					
-					new File("Source/Faction/").mkdirs();
+					link = link.substring(link.indexOf(", ")).substring(2);
 					
-					ImageIO.write((BufferedImage) img, "png", new File(directory));
-					
-				} catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 				
+				Image img = null;
+				String directory = "Source/Faction/" + name + ".png";
+				
+				try {
+					
+					img = ImageIO.read(new File(directory));
+					
+				} catch (Exception e2) {
+					// TODO: handle exception
+					
+					System.out.println(" > Failed to get image from " + directory);
+					
+					try {
+						img = ImageIO.read(new URL("https://azurlane.koumakan.jp" + link));
+						
+						new File("Source/Faction/").mkdirs();
+						
+						ImageIO.write((BufferedImage) img, "png", new File(directory));
+						
+					} catch (MalformedURLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+				}
+				
+				factions.add(new Faction(name, img));
+				
 			}
 			
-			
-			
-			factions.add(new Faction(name, img));
-			
+			DatabaseAdapter.saveFaction(factions);
+		
 		}
 		
 		return factions;

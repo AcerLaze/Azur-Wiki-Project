@@ -298,7 +298,11 @@ public class WindowsManager extends JFrame{
 			
 			JPanel faction_banner = new JPanel();
 			faction_banner.setLayout(new BoxLayout(faction_banner, BoxLayout.Y_AXIS));
-			faction_banner.setBackground(ship.getFaction().getFactionColor());
+			
+			faction_banner.setBackground(new Color(ship.getFaction().getFactionColor().getRed(), 
+												   ship.getFaction().getFactionColor().getGreen(), 
+												   ship.getFaction().getFactionColor().getBlue(), 
+												   180));
 			faction_banner.setPreferredSize(new Dimension(285, 730));
 			
 			
@@ -311,8 +315,8 @@ public class WindowsManager extends JFrame{
 				image_container.add(image);
 				image_container.setMaximumSize(new Dimension(100, 100));
 				image_container.setBorder(new EmptyBorder(10, 10, 10, 10));
-				image.setBackground(null);
-				image_container.setBackground(null);
+				image.setBackground(new Color(0, 0, 0, 0));
+				image_container.setBackground(new Color(0, 0, 0, 0));
 			
 				faction_banner.add(image_container);
 			
@@ -324,7 +328,7 @@ public class WindowsManager extends JFrame{
 			faction_title.setForeground(Color.black);
 			faction_title.setAlignmentX(Component.CENTER_ALIGNMENT);
 			faction_title.setOpaque(true);
-			faction_title.setBackground(null);
+			faction_title.setBackground(new Color(0, 0, 0, 0));
 			faction_title.setBorder(new EmptyBorder(10, 10, 10, 10));
 			
 			faction_banner.add(faction_title);

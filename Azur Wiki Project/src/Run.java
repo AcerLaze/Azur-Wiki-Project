@@ -21,6 +21,9 @@ public class Run {
 		
 		WebAdapter webAdapter;
 		ShipContainer container = null;
+		DatabaseAdapter.connect();
+		DatabaseAdapter.checkDB();
+		
 		try {
 			
 			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
@@ -327,29 +330,13 @@ public class Run {
 		
 		WebAdapter webAdapter;
 		
-		try {
-			
-			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
-			ShipContainer ship = webAdapter.requestShipList();
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		 
-//
-//		for (Ship ship : container.getShip(ShipContainer.NORMAL_SHIP)) {
-//			
-//			//if(ship.getName().contentEquals("San Diego")) { ship.getData(); run_windows(ship);}
-//			if(ship.getName().contentEquals("Jean Bart")) { ship.getData(); run_windows(ship);}
-//			//if(ship.getName().contentEquals("Enterprise")) { ship.getData(); run_windows(ship);}
-//			if(ship.getName().contentEquals("Ayanami")) { ship.getData(); run_windows(ship);}
-//			if(ship.getName().contentEquals("Bogue")) { ship.getData(); run_windows(ship);}
-//			if(ship.getName().contentEquals("Long Island")) { ship.getData(); run_windows(ship);}
-//			
-//		}
+		DatabaseAdapter.checkDB();
 		
-		
+		webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
+		ShipContainer ship = webAdapter.requestShipList();
+		//DatabaseAdapter.selectAllFaction();
+		//DatabaseAdapter.selectAllShip();
+
 	}
 
 }
