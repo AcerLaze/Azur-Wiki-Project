@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -37,7 +36,7 @@ public class WebAdapter {
 		
 		try {
 			
-			Ship_Page = null;//Jsoup.connect(url).timeout(12000).get();
+			Ship_Page = Jsoup.connect(url).get();
 			
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -140,6 +139,12 @@ public class WebAdapter {
 						
 					}
 					
+					if(faction == null) {
+						
+						faction = shipList.addFaction(ShipData.get(4).text());
+
+					}
+					
 					Ship ship = new Ship(ShipData.get(0).text(), 
 							    ShipData.get(1).text(),
 							    ShipData.get(2).text(), 
@@ -178,6 +183,12 @@ public class WebAdapter {
 						
 					}
 					
+					if(faction == null) {
+						
+						faction = shipList.addFaction(ShipData.get(4).text());
+
+					}
+					
 					Ship ship = new Ship(ShipData.get(0).text(), 
 							  ShipData.get(1).text(),
 							  ShipData.get(2).text(),
@@ -214,6 +225,12 @@ public class WebAdapter {
 							
 						}
 						
+					}
+					
+					if(faction == null) {
+						
+						faction = shipList.addFaction(ShipData.get(4).text());
+
 					}
 					
 					Ship ship = new Ship(ShipData.get(0).text(), 
@@ -291,7 +308,6 @@ public class WebAdapter {
 		return skills;
 		
 	}
-	
 	
 	public List<Equipment> requestShipEquipment(String shipId) {
 		//Returning available equipment from wiki in form of List
@@ -457,7 +473,7 @@ public class WebAdapter {
 			
 			shipClass = row.get(2).select("td").text();
 			
-			System.out.println(shipClass + shipID);
+			//System.out.println(shipClass + shipID);
 			
 			DatabaseAdapter.saveShipClass(shipClass, shipID);
 			
@@ -496,19 +512,32 @@ public class WebAdapter {
 		return links;
 		
 	}
-
 	
-	public Image getIcon(String name) throws Exception{
+	public Image getIcon(String name) {
 		
 		Image img = null;
 		String link = "https://azurlane.koumakan.jp";
-		String tag = "img[alt='" + name + "Icon.png']";
+		String tag = "img[alt=\"" + name + "Icon.png\"]";
+		
+		//System.out.println(tag);
 		
 		Elements image_icon = Ship_Page.select(tag);
 		
+		//System.out.println(image_icon.outerHtml());
+		
 		link += image_icon.get(0).attr("src");
 		
-		img = ImageIO.read(new URL(link));
+		//System.out.println(link);
+		
+		try {
+			img = ImageIO.read(new URL(link));
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		return img;
 		

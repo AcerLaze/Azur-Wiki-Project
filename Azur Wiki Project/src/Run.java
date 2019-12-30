@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 public class Run {
 
 	private int system_mod = 0;
-	private boolean console_mode = true;
+	private boolean console_mode = false;
 	private WindowsManager window;
 	
 	Run(){
@@ -37,24 +37,22 @@ public class Run {
 		
 		
 		if(console_mode) console(container);
-		//else run_windows(container);
+		else run_windows(container);
 		
 		//
 		
 		
 	}
 	
-	private void run_windows(Ship ship) {
-		
-		window = new WindowsManager();
+	private void run_windows(ShipContainer shipList) {
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				
-				window.ship_detail_window(ship);
+				window = new WindowsManager();
+				window.shipSelect(shipList);
 				
 			}
 		});
@@ -225,7 +223,7 @@ public class Run {
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
-										run_windows(ship);
+										
 										
 										break;
 										
@@ -236,18 +234,6 @@ public class Run {
 								break;
 							
 							case "priority":
-								
-								String temp[] = cmd[2].split("_");
-								
-								name = "";
-								
-								for (String string : temp) {
-									
-									name += " " + string;
-									
-								}
-								
-								name = name.substring(1);
 								
 								for (Ship ship : container.getShip(ShipContainer.PRIORITY_SHIP)) {
 									
@@ -260,7 +246,7 @@ public class Run {
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
-										run_windows(ship);
+										
 										
 										break;
 										
@@ -283,7 +269,7 @@ public class Run {
 										System.out.println("Health    : " + ship.getHealth());
 										System.out.println("Firepower : " + ship.getFirepower());
 										
-										run_windows(ship);
+										
 										
 										break;
 										
@@ -299,6 +285,7 @@ public class Run {
 							// TODO: handle exception
 							
 							System.out.println(" > " + e.getMessage());
+							e.printStackTrace();
 						}
 						
 						break;
@@ -312,6 +299,7 @@ public class Run {
 			} catch (Exception e) {
 				// TODO: handle exception
 				System.out.println("> " + e.getMessage());
+				e.printStackTrace();
 				
 			}
 			
@@ -328,6 +316,7 @@ public class Run {
 	
 	private void debug() {
 		
+		/*
 		WebAdapter webAdapter;
 		
 		DatabaseAdapter.checkDB();
@@ -336,6 +325,8 @@ public class Run {
 		ShipContainer ship = webAdapter.requestShipList();
 		//DatabaseAdapter.selectAllFaction();
 		//DatabaseAdapter.selectAllShip();
+		 * 
+		 */
 
 	}
 

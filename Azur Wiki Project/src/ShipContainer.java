@@ -251,6 +251,18 @@ public class ShipContainer{
 		
 	}
 	
+	public Faction addFaction(String name) {
+		
+		Faction faction = new Faction(name, null);
+		
+		factionList.add(faction);
+		
+		DatabaseAdapter.saveFaction(factionList);
+		
+		return faction;
+		
+	}
+	
 	//Just a getter and setter. Ignore it
 	public Ship[] getAvg_ship_holder() {
 		return avg_ship_holder;

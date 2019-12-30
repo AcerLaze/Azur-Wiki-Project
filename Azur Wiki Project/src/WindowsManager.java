@@ -8,26 +8,40 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+@SuppressWarnings("serial")
 public class WindowsManager extends JFrame{
+	
+	private ShipContainer shipList;
+	private List<Ship> ships;
 	
 	WindowsManager(){
 		
@@ -39,10 +53,273 @@ public class WindowsManager extends JFrame{
 		
 		setResizable(false);
 		
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
 		pack();
+		
+	}
+	
+	public void shipSelect(ShipContainer shipList) {
+		
+		this.shipList = shipList;
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		
+		panel.setBounds(0, 0, 1500, 870);
+		panel.setBackground(new Color(0, 0, 0, 0));
+		
+		panel.add(ship_select_main_window());
+		
+		add(panel);
+		
+		setBackground();
+		
+		pack();
+		
+		repaint();
 		
 		setVisible(true);
 		
+	}
+	
+	private JPanel ship_select_main_window() {
+		
+		ships = new ArrayList<Ship>();
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(0, 0, 0, 0));
+		panel.setPreferredSize(new Dimension(1500, 870));
+		panel.setBorder(new EmptyBorder(10, 50, 10, 50));
+		
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+		mainPanel.setPreferredSize(new Dimension(1000, 820));
+		mainPanel.setBackground(new Color(0, 0, 0, 200));
+		
+		JScrollPane main_scroll_panel = new JScrollPane();
+		
+		JPanel header = new JPanel();
+		header.setBackground(Color.DARK_GRAY);
+		header.setBorder(new EmptyBorder(10, 50, 10, 50));
+		header.setMaximumSize(new Dimension(1000, 140));
+		header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+		
+		JLabel title = new JLabel("Azur Lane Ship Wiki", JLabel.LEFT);
+		title.setFont(new Font(title.getFont().getFontName(), Font.BOLD, 40));
+		title.setForeground(Color.white);
+		
+		header.add(title);
+		
+		JPanel searchPanel = new JPanel();
+		searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
+		searchPanel.setMinimumSize(new Dimension(800, 70));
+		searchPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+		searchPanel.setAlignmentX(CENTER_ALIGNMENT);
+		searchPanel.setBackground(new Color(0, 0, 0, 0));
+		
+		JButton filter = new JButton();
+		filter.setMaximumSize(new Dimension(40, 40));
+		
+		JTextField searchBar = new JTextField();
+		searchBar.setMaximumSize(new Dimension(700, 40));
+		searchBar.setFont(new Font(searchBar.getFont().getFontName(), Font.PLAIN, 20));
+		
+		searchBar.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+				ships.clear();
+				
+				for (Ship ship : shipList.getShip(ShipContainer.NORMAL_SHIP)) {
+					
+					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
+						
+						ships.add(ship);
+						
+					}
+					
+				}
+				
+				for (Ship ship : shipList.getShip(ShipContainer.PRIORITY_SHIP)) {
+					
+					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
+						
+						ships.add(ship);
+						
+					}
+					
+				}
+
+				for (Ship ship : shipList.getShip(ShipContainer.COLLAB_SHIP)) {
+					
+					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
+						
+						ships.add(ship);
+						
+					}
+					
+				}
+				
+				main_scroll_panel.setViewportView(ship_select_scroll_panel(ships));
+				repaint();
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		JLabel emptyContent = new JLabel();
+		emptyContent.setMaximumSize(new Dimension(20, 20));
+		
+		searchPanel.add(filter);
+		searchPanel.add(emptyContent);
+		searchPanel.add(searchBar);
+		
+		header.add(searchPanel);
+		
+		mainPanel.add(header);
+		
+		//main_scroll_panel.setPreferredSize(new Dimension(1000, 500));
+		
+		main_scroll_panel.setOpaque(false);
+		
+		ships.addAll(shipList.getShip(ShipContainer.NORMAL_SHIP));
+		ships.addAll(shipList.getShip(ShipContainer.PRIORITY_SHIP));
+		ships.addAll(shipList.getShip(ShipContainer.COLLAB_SHIP));
+		
+		main_scroll_panel.setViewportView(ship_select_scroll_panel(ships));
+		main_scroll_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		main_scroll_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		main_scroll_panel.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+			
+			@Override
+			public void adjustmentValueChanged(AdjustmentEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				repaint();
+				
+			}
+		});
+		
+		main_scroll_panel.getViewport().setOpaque(false);
+		main_scroll_panel.getViewport().setBackground(new Color(0, 0, 0, 0));
+		main_scroll_panel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
+		
+		main_scroll_panel.setBackground(new Color(0, 0, 0, 0));
+		mainPanel.add(main_scroll_panel);
+		
+		panel.add(mainPanel);
+		
+		return panel;
+		
+	}
+	
+	private JPanel ship_select_scroll_panel(List<Ship> ships) {
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(0, 0, 0, 0));
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints g = new GridBagConstraints();
+		
+		g.gridx = g.gridy = 0;
+		g.weightx = g.weighty = 0.5;
+		
+		for (Ship ship : ships) {
+			
+			if(!ship.isDownloaded())ship.getData();
+			
+			JPanel shipHolder = new JPanel();
+			shipHolder.setBorder(new EmptyBorder(5, 5, 5, 5));
+			shipHolder.setPreferredSize(new Dimension(120, 150));
+			shipHolder.setLayout(new BoxLayout(shipHolder, BoxLayout.Y_AXIS));
+			shipHolder.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+			shipHolder.setBackground(new Color(255, 255, 255, 255));
+			
+			JLabel shipName = new JLabel("<html><body style='text-align: center'>" + ship.getName() + "</body></html>", JLabel.CENTER);
+			shipName.setMinimumSize(new Dimension(100, 30));
+			shipName.setOpaque(true);
+			shipName.setBackground(new Color(0, 0, 0, 0));
+			shipName.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+			
+			shipHolder.add(ship.loadIcon());
+			shipHolder.add(new JSeparator());
+			shipHolder.add(shipName);
+			
+			shipHolder.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+					getContentPane().removeAll();
+					ship_detail_window(ship);
+					repaint();
+					
+				}
+				
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+					shipHolder.setBackground(new Color(255, 255, 255, 255));
+					repaint();
+					
+				}
+				
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+					shipHolder.setBackground(new Color(255, 255, 255, 100));
+					repaint();
+					
+				}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});;
+			
+			
+			panel.add(shipHolder, g);
+			
+			g.gridx++;
+			
+			if(g.gridx > 6) {
+				
+				g.gridx = 0;
+				g.gridy++;
+				
+			}
+			
+		}
+		
+		panel.setPreferredSize(new Dimension(950, g.gridy * 170));
+		
+		
+		return panel;
 		
 	}
 	
@@ -62,6 +339,16 @@ public class WindowsManager extends JFrame{
 		panel.setBackground(new Color(0, 0, 0, 0));
 		add(panel);
 	
+		setBackground();
+		
+		pack();
+		
+		repaint();
+		
+	}
+	
+	private void setBackground() {
+		
 		try {
 			
 			Image background = ImageIO.read(new File("Source/bg.png"));
@@ -79,10 +366,6 @@ public class WindowsManager extends JFrame{
 			e.printStackTrace();
 		}
 		
-		pack();
-		
-		repaint();
-		
 	}
 	
 	private JPanel ship_detail_sidebar_window(Ship ship) {
@@ -95,7 +378,6 @@ public class WindowsManager extends JFrame{
 		panel.setBorder(new EmptyBorder(new Insets(10, 10, 10, 10))); //UP LEFT DOWN RIGHT
 		
 		JPanel img_container = new JPanel();
-		img_container.setPreferredSize(new Dimension(337, 512));
 		try {
 			
 			img_container = ship.loadImage(0);
@@ -104,7 +386,7 @@ public class WindowsManager extends JFrame{
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			
+			System.out.println(" > Error loading Image");
 			
 		}
 		
@@ -112,19 +394,52 @@ public class WindowsManager extends JFrame{
 		
 		JPanel name_panel = new JPanel();
 		name_panel.setLayout(new FlowLayout());
-		name_panel.setPreferredSize(new Dimension(300, 75));
+		name_panel.setPreferredSize(new Dimension(300, 85));
 		name_panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		name_panel.setBackground(new Color(0, 0, 0, 0));
 		
-		JLabel name = new JLabel(ship.getName(), SwingConstants.RIGHT);
+		JLabel name = new JLabel("<html><body style='text-align: center'>" + ship.getName() + "</body></html>", JLabel.CENTER);
 		name.setAlignmentX(Component.CENTER_ALIGNMENT);
 		name.setOpaque(true);
 		name.setBorder(new EmptyBorder(10, 0, 10, 0));
-		name.setFont(new Font("Serif", Font.PLAIN, 40));
+		name.setFont(new Font("Serif", Font.PLAIN, 30));
 		name.setBackground(new Color(0, 0, 0, 0));
 		name.setForeground(Color.WHITE);
+		name.setPreferredSize(new Dimension(180, 70));
 		
+		JButton next = new JButton();
+		JButton prev = new JButton();
+		
+		next.setPreferredSize(new Dimension(50, 50));
+		prev.setPreferredSize(new Dimension(50, 50));
+		
+		next.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				ship.nextImage();
+				repaint();
+				
+			}
+		});
+		
+		prev.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				ship.prevImage();
+				repaint();
+				
+			}
+		});
+		
+		name_panel.add(prev);
 		name_panel.add(name);
+		name_panel.add(next);
 		
 		panel.add(name_panel);
 		
@@ -256,9 +571,25 @@ public class WindowsManager extends JFrame{
 		
 		JLabel ship_name = new JLabel(ship.getName(), JLabel.LEFT);
 		ship_name.setFont(new Font("Serif", Font.PLAIN, 40));
-		ship_name.setPreferredSize(new Dimension(200, 50));
+		ship_name.setPreferredSize(new Dimension(500, 50));
 		ship_name.setForeground(Color.white);
 		
+		JButton back = new JButton("Back");
+		back.setPreferredSize(new Dimension(100, 50));
+		
+		back.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				getContentPane().removeAll();
+				shipSelect(shipList);
+				repaint();
+				
+			}
+		});
+		
+		header.add(back);
 		header.add(ship_name);
 		header.setBackground(new Color(100, 100, 100, 180));
 		header.setBorder(new EmptyBorder(10, 10, 10, 10));

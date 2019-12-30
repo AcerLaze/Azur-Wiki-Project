@@ -79,8 +79,7 @@ public class DatabaseAdapter {
 					"	shipID TEXT,\r\n" + 
 					"	name TEXT,\r\n" + 
 					"	efficiency TEXT,\r\n" + 
-					"	FOREIGN KEY (shipID) REFERENCES ship(id),\r\n" + 
-					"	PRIMARY KEY(shipID, name)\r\n" + 
+					"	FOREIGN KEY (shipID) REFERENCES ship(id)\r\n" + 
 					");";
 			
 			stmt.execute(sql);
@@ -168,7 +167,6 @@ public class DatabaseAdapter {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
-			
 			
 		}
 		
@@ -487,7 +485,6 @@ public class DatabaseAdapter {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
-			System.out.println(ship.getName());
 			
 		}
 		
@@ -499,12 +496,13 @@ public class DatabaseAdapter {
 		
 		boolean save = false;
 		
+		String insertSql = "INSERT INTO skill VALUES \n";
+		
 		try {
 
 			ResultSet set;
 			
 			//System.out.println(sql);
-			String insertSql = "INSERT INTO skill VALUES \n";
 			
 			for (Skill skill : skills) {
 				
@@ -517,7 +515,7 @@ public class DatabaseAdapter {
 				if(set.getInt(1) == 0) {
 					
 					save = true;
-					insertSql += "(\"" + shipID + "\", \"" + skill.getName() + "\", \"" + skill.getDescription() + "\", " + skill.getType() + "),\n";
+					insertSql += "(\"" + shipID + "\", \"" + skill.getName() + "\", \"" + skill.getDescription().replace('\"', ' ') + "\", " + skill.getType() + "),\n";
 					
 				}
 				
@@ -532,6 +530,8 @@ public class DatabaseAdapter {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
+			System.out.println(insertSql);
+			
 		}
 		
 	}
@@ -573,6 +573,7 @@ public class DatabaseAdapter {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
+			
 		}
 		
 	}
@@ -649,7 +650,7 @@ public class DatabaseAdapter {
 		String sql;
 		
 		try {
-
+			
 			sql = "UPDATE ship SET health = " + ship.getHealth() + ",\n" +
 				  " armourType = \"" + ship.getArmour_type() + "\",\n" +
 				  " reload = " + ship.getReload() + ",\n" +
@@ -675,6 +676,8 @@ public class DatabaseAdapter {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
+			
+			
 		}
 		
 	}

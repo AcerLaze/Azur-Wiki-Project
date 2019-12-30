@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -8,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
 public class Ship {
 
@@ -60,6 +61,7 @@ public class Ship {
 	private List<Skill> skills;
 	private List<Equipment> equipments;
 	private List<Image> image;
+	private List<String> imageUrl;
 	private Image icon;
 	private JLabel img_container;
 
@@ -89,7 +91,7 @@ public class Ship {
 		WebAdapter web_adapter;
 
 		web_adapter = new WebAdapter(link, WebAdapter.SHIP_DETAIL);
-
+		
 		if(!rarity.contentEquals("Unreleased")) {
 			//If the ship is unrelease, dont bother to fetch more data or it will cause error
 			retrofitable = web_adapter.requestIsShipRetrofitable();
@@ -99,6 +101,8 @@ public class Ship {
 
 				System.out.println(" > Fetching icon from " + directory);
 				icon = ImageIO.read(new File(directory));
+				
+				icon = icon.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 				
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -112,6 +116,8 @@ public class Ship {
 					new File("Source/" + name + "/").mkdirs();
 					
 					ImageIO.write((BufferedImage)icon, "png", new File(directory));
+					
+					icon = icon.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
 					
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -130,52 +136,8 @@ public class Ship {
 			
 			ship_class = web_adapter.requestClass(id);
 			
+			imageUrl = web_adapter.getImage(id);
 			image = new ArrayList<Image>();
-			
-			for (String url : web_adapter.getImage(id)) {
-			
-				Image img = null;
-				
-				directory = "Source/" + name + "/";
-				
-				try {
-					
-					String[] temp = url.split("/");
-					
-					directory += temp[temp.length - 1];
-					
-					System.out.println(" > Fetching picture from " + directory);
-					
-					img = ImageIO.read(new File(directory));
-					
-				} catch (Exception e) {
-					// TODO: handle exception
-					System.out.println(" > Failed to load picture from " + directory);
-					System.out.println(" > Downloading from the wiki...");
-					try {
-						
-						//System.out.println(url);
-						
-						img = ImageIO.read(new URL(url));
-						
-						new File("Source/" + name + "/").mkdirs();
-						
-						ImageIO.write((BufferedImage)img, "png", new File(directory));
-						
-					} catch (Exception ee) {
-						// TODO Auto-generated catch block
-						
-						System.out.println(" > Failed to download image from " + url);
-						
-					}
-					
-				}
-				
-				int width = (int)(img.getWidth(null) * 0.5);
-				int height = (int)(img.getHeight(null) * 0.5);
-				image.add(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
-				
-			};
 			
 			web_adapter.getShipStat(this);
 			
@@ -189,27 +151,87 @@ public class Ship {
 			construction_time = "-";
 			ship_class = "?";
 			
+			setDownloaded(true);
+			
 		}
 		
 	}
 
+	public void loadImage() {
+		
+		String directory;
+		
+		for (String url : imageUrl) {
+		
+			Image img = null;
+			
+			directory = "Source/" + name + "/";
+			
+			try {
+				
+				String[] temp = url.split("/");
+				
+				directory += temp[temp.length - 1];
+				
+				System.out.println(" > Fetching picture from " + directory);
+				
+				img = ImageIO.read(new File(directory));
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println(" > Failed to load picture from " + directory);
+				System.out.println(" > Downloading from the wiki...");
+				try {
+					
+					//System.out.println(url);
+					
+					img = ImageIO.read(new URL(url));
+					
+					new File("Source/" + name + "/").mkdirs();
+					
+					ImageIO.write((BufferedImage)img, "png", new File(directory));
+					
+				} catch (Exception ee) {
+					// TODO Auto-generated catch block
+					
+					System.out.println(" > Failed to download image from " + url);
+					img = null;
+					
+				}
+				
+			}
+			
+			if(img != null) {
+				
+				int width = (int)(img.getWidth(null) * 0.5);
+				int height = (int)(img.getHeight(null) * 0.5);
+				image.add(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+				
+			}
+			
+		};
+		
+	}
+	
 	public JPanel loadImage(int index) throws Exception{
 		
 		JPanel image_panel = new JPanel();
 		
+		image_panel.setLayout(new BorderLayout());
+		
+		if(image.size() < 1) loadImage();
+		
 		img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
 		
-		int width = image.get(index).getWidth(null) / 2;
-		int height = image.get(index).getHeight(null) / 2;
-		
-		width = (337 / 2) - (width);
-		height = (512 / 2) - (height);
+		img_container.setHorizontalAlignment(JLabel.CENTER);
+		img_container.setVerticalAlignment(JLabel.CENTER);
 		
 		image_panel.add(img_container);
-		image_panel.setPreferredSize(new Dimension(337, 512));
-		image_panel.setBorder(new EmptyBorder(height, width, 0, 0));
-		image_panel.setBackground(getRarityColor());
+		image_panel.setPreferredSize(new Dimension(337, 550));
 		
+		//image_panel.setBorder(new EmptyBorder(0, 0, 0, 0));
+		image_panel.setBackground(getRarityColor());
+	
 		return image_panel;
 		
 	}
@@ -218,9 +240,22 @@ public class Ship {
 		
 		JPanel panel = new JPanel();
 		
-		JLabel icon = new JLabel(new ImageIcon(this.icon));
+		try {
 		
-		panel.add(icon);
+			JLabel iconContainer = new JLabel(new ImageIcon(icon));
+			iconContainer.setBackground(new Color(0, 0, 0, 0));
+			iconContainer.setBorder(BorderFactory.createLineBorder(Color.black));
+			
+			panel.add(iconContainer);
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(" > Failed to load " + name + " Icon");
+			
+		}
+		
+		panel.setBackground(new Color(0, 0, 0, 0));
+		//panel.setPreferredSize(new Dimension(100, 100));
 		
 		return panel;
 		
@@ -233,14 +268,13 @@ public class Ship {
 		
 		try {
 			
-			img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
+			img_container.setIcon(new ImageIcon(image.get(index)));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			
 		}
-
 		
 	}
 	
@@ -251,7 +285,7 @@ public class Ship {
 		
 		try {
 			
-			img_container = new JLabel(new ImageIcon(image.get(index)), JLabel.CENTER);
+			img_container.setIcon(new ImageIcon(image.get(index)));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
