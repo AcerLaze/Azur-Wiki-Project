@@ -349,7 +349,7 @@ public class Ship {
 			break;
 			
 		default:
-			background = new Color(255, 255, 255);
+			background = new Color(255, 0, 255);
 
 		}
 		

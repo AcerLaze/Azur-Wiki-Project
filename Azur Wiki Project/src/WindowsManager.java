@@ -53,6 +53,7 @@ public class WindowsManager extends JFrame{
 	private Map<Integer, Integer> shipTypeFilter = new HashMap<Integer, Integer>();
 	
 	private JScrollPane main_scroll_panel = new JScrollPane();
+	private JFrame loadZone;
 	
 	WindowsManager(ShipContainer shipList){
 		
@@ -73,6 +74,32 @@ public class WindowsManager extends JFrame{
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		pack();
+		
+	}
+	
+	public void startLoading() {
+		
+		loadZone = new JFrame();
+		loadZone.setPreferredSize(new Dimension(200, 200));
+		
+		JPanel panel = new JPanel();
+		
+		JLabel loadTitle = new JLabel("Loading");
+		
+		panel.add(loadTitle);
+		
+		loadZone.add(panel);
+		
+		loadZone.setVisible(true);
+		loadZone.pack();
+		loadZone.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		loadZone.repaint();
+		
+	}
+	
+	public void finishLoading() {
+		
+		loadZone.dispose();
 		
 	}
 	

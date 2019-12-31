@@ -1,6 +1,7 @@
 
 import java.util.Scanner;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -53,14 +54,16 @@ public class Run {
 	
 	private void run_windows(ShipContainer shipList) {
 		
+		window = new WindowsManager(shipList);
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				
-				window = new WindowsManager(shipList);
+				window.startLoading();
 				window.shipSelect();
+				window.finishLoading();
 				
 			}
 		});
