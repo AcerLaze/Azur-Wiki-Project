@@ -80,11 +80,17 @@ public class WindowsManager extends JFrame{
 	public void startLoading() {
 		
 		loadZone = new JFrame();
-		loadZone.setPreferredSize(new Dimension(200, 200));
+		loadZone.setPreferredSize(new Dimension(500, 300));
+		loadZone.setLocationRelativeTo(null);
+		loadZone.setResizable(false);
 		
 		JPanel panel = new JPanel();
+		panel.setPreferredSize(new Dimension (200, 100));
+		panel.setBorder(new EmptyBorder(100, 50, 100, 50));
 		
-		JLabel loadTitle = new JLabel("Loading");
+		JLabel loadTitle = new JLabel("Loading", JLabel.CENTER);
+		loadTitle.setAlignmentY(CENTER_ALIGNMENT);
+		loadTitle.setFont(new Font(loadTitle.getFont().getFontName(), Font.BOLD, 30));
 		
 		panel.add(loadTitle);
 		
@@ -93,7 +99,6 @@ public class WindowsManager extends JFrame{
 		loadZone.setVisible(true);
 		loadZone.pack();
 		loadZone.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		loadZone.repaint();
 		
 	}
 	

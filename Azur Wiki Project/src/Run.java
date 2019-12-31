@@ -56,12 +56,14 @@ public class Run {
 		
 		window = new WindowsManager(shipList);
 		
+		window.startLoading();
+		
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				window.startLoading();
 				window.shipSelect();
 				window.finishLoading();
 				
