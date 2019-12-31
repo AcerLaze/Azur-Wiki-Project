@@ -26,6 +26,7 @@ public class ShipContainer{
 	public static final int AR = 8;
 	public static final int SS = 9;
 	public static final int AM = 10;
+	public static final int CB = 11;
 	
 	public ShipContainer() {
 		// TODO Auto-generated constructor stub
@@ -131,6 +132,12 @@ public class ShipContainer{
 		case "Submarine Carrier":
 			
 			type = AM;
+			
+			break;
+			
+		case "Large Cruiser":
+			
+			type = CB;
 			
 			break;
 		

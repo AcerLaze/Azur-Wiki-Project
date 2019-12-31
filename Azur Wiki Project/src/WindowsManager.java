@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -19,13 +21,16 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,7 +48,19 @@ public class WindowsManager extends JFrame{
 	private ShipContainer shipList;
 	private List<Ship> ships;
 	
-	WindowsManager(){
+	private String shipCategoryFilter;
+	private String shipFactionFilter;
+	private Map<Integer, Integer> shipTypeFilter = new HashMap<Integer, Integer>();
+	
+	private JScrollPane main_scroll_panel = new JScrollPane();
+	
+	WindowsManager(ShipContainer shipList){
+		
+		this.shipList = shipList;
+		
+		setTitle("Azur Lane Ship Wiki (ALSW)");
+		
+		resetFilter();
 		
 		setLayout(null);
 		
@@ -59,9 +76,430 @@ public class WindowsManager extends JFrame{
 		
 	}
 	
-	public void shipSelect(ShipContainer shipList) {
+	private void resetFilter() {
 		
-		this.shipList = shipList;
+		shipCategoryFilter = shipFactionFilter = "";
+		
+		for (Faction faction : shipList.getFactionList()) {
+			
+			shipFactionFilter += faction.getName() + "#";
+			
+		}
+		
+		shipCategoryFilter = "NPC";
+		
+		shipTypeFilter.put(ShipContainer.DD, 1);
+		shipTypeFilter.put(ShipContainer.CL, 1);
+		shipTypeFilter.put(ShipContainer.CA, 1);
+		shipTypeFilter.put(ShipContainer.BC, 1);
+		shipTypeFilter.put(ShipContainer.BB, 1);
+		shipTypeFilter.put(ShipContainer.AR, 1);
+		shipTypeFilter.put(ShipContainer.CV, 1);
+		shipTypeFilter.put(ShipContainer.CVL, 1);
+		shipTypeFilter.put(ShipContainer.SS, 1);
+		shipTypeFilter.put(ShipContainer.BM, 1);
+		shipTypeFilter.put(ShipContainer.AM, 1);
+		shipTypeFilter.put(ShipContainer.CB, 1);
+		
+	}
+	
+	private void filterWindow() {
+		
+		JFrame frame = new JFrame("Filter");
+		frame.setLocationRelativeTo(this);
+		
+		frame.setResizable(false);
+		
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
+		mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		JPanel leftColumn = new JPanel();
+		leftColumn.setLayout(new BoxLayout(leftColumn, BoxLayout.Y_AXIS));
+		
+		JPanel shipFilter = new JPanel();
+		shipFilter.setBorder(BorderFactory.createTitledBorder("Ship"));
+		
+		JCheckBox normalType = new JCheckBox("Normal");
+		if(shipCategoryFilter.contains("N")) normalType.setSelected(true);
+		normalType.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange() == ItemEvent.DESELECTED) {
+					
+					shipCategoryFilter = shipCategoryFilter.replace("N", "");
+					
+				} else {
+					
+					shipCategoryFilter += "N";
+					
+				}
+				
+			}
+		});
+		
+		JCheckBox priorityType = new JCheckBox("Priority");
+		if(shipCategoryFilter.contains("P")) priorityType.setSelected(true);
+		priorityType.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange() == ItemEvent.DESELECTED) {
+					
+					shipCategoryFilter = shipCategoryFilter.replace("P", "");
+					
+				} else {
+					
+					shipCategoryFilter += "P";
+
+				}
+			}
+		});
+		
+		JCheckBox collabType = new JCheckBox("Collab");
+		if(shipCategoryFilter.contains("C")) collabType.setSelected(true);
+		collabType.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange() == ItemEvent.DESELECTED) {
+					
+					shipCategoryFilter = shipCategoryFilter.replace("C", "");
+					
+				} else {
+					
+					shipCategoryFilter += "C";
+					
+				}
+			}
+		});
+		
+		JPanel factionFilter = new JPanel();
+		factionFilter.setBorder(BorderFactory.createTitledBorder("Faction"));
+		
+		JPanel factionList = new JPanel();
+		factionList.setLayout(new GridBagLayout());
+		GridBagConstraints g = new GridBagConstraints();
+		
+		g.gridx = g.gridy = 0;
+		g.weightx = g.weighty = 0.1;
+		g.fill = GridBagConstraints.BOTH;
+		g.anchor = GridBagConstraints.WEST;
+		
+		for (Faction fac : shipList.getFactionList()) {
+			
+			JCheckBox faction = new JCheckBox(fac.getName());
+			if(shipFactionFilter.contains(fac.getName())) faction.setSelected(true);
+			faction.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					// TODO Auto-generated method stub
+					if(e.getStateChange() == ItemEvent.DESELECTED) {
+						
+						shipFactionFilter = shipFactionFilter.replace(fac.getName() + "#", "");
+						
+					} else {
+						
+						shipFactionFilter += fac.getName() + "#";
+						
+					}
+				}
+			});
+			
+			factionList.add(faction, g);
+			
+			g.gridx++;
+			
+			if(g.gridx == 3) {
+				
+				g.gridy++;
+				g.gridx = 0;
+				
+			}
+			
+		}
+		
+		shipFilter.add(normalType);
+		shipFilter.add(priorityType);
+		shipFilter.add(collabType);
+		
+		factionFilter.add(factionList);
+		
+		leftColumn.add(shipFilter);
+		leftColumn.add(factionFilter);
+		
+		JPanel rightColumn = new JPanel();
+		
+		JPanel shipTypeFilterPanel = new JPanel();
+		shipTypeFilterPanel.setBorder(BorderFactory.createTitledBorder("Ship Type"));
+		
+		JPanel shipTypeList = new JPanel();
+		shipTypeList.setLayout(new GridBagLayout());
+		g.gridx = g.gridy = 0;
+		g.weightx = g.weighty = 0.1;
+		g.fill = GridBagConstraints.BOTH;
+		g.anchor = GridBagConstraints.WEST;
+		
+		//shipType
+		JCheckBox largeCruiser = new JCheckBox("Large Cruiser");
+		if(shipTypeFilter.get(ShipContainer.CB) == 1) largeCruiser.setSelected(true);
+		largeCruiser.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.CB, 1);
+				else shipTypeFilter.replace(ShipContainer.CB, 0);
+				
+			}
+		});
+		shipTypeList.add(largeCruiser, g);
+		g.gridy++;
+		
+		JCheckBox heavyCruiser = new JCheckBox("Heavy Cruiser");
+		if(shipTypeFilter.get(ShipContainer.CA) == 1) heavyCruiser.setSelected(true);
+		heavyCruiser.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.CA, 1);
+				else shipTypeFilter.replace(ShipContainer.CA, 0);
+				
+			}
+		});
+		shipTypeList.add(heavyCruiser, g);
+		g.gridy++;
+		
+		JCheckBox lightCruiser = new JCheckBox("Light Cruiser");
+		if(shipTypeFilter.get(ShipContainer.CL) == 1) lightCruiser.setSelected(true);
+		lightCruiser.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.CL, 1);
+				else shipTypeFilter.replace(ShipContainer.CL, 0);
+				
+			}
+		});
+		shipTypeList.add(lightCruiser, g);
+		g.gridy++;
+		
+		JCheckBox battleship = new JCheckBox("Battleship");
+		if(shipTypeFilter.get(ShipContainer.BB) == 1) battleship.setSelected(true);
+		battleship.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.BB, 1);
+				else shipTypeFilter.replace(ShipContainer.BB, 0);
+				
+			}
+		});
+		shipTypeList.add(battleship, g);
+		g.gridy++;
+		
+		JCheckBox battlecruiser = new JCheckBox("Battlecruiser");
+		if(shipTypeFilter.get(ShipContainer.BC) == 1) battlecruiser.setSelected(true);
+		battlecruiser.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.BC, 1);
+				else shipTypeFilter.replace(ShipContainer.BC, 0);
+				
+			}
+		});
+		shipTypeList.add(battlecruiser, g);
+		g.gridy++;
+		
+		JCheckBox monitor = new JCheckBox("Monitor");
+		if(shipTypeFilter.get(ShipContainer.BM) == 1) monitor.setSelected(true);
+		monitor.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.BM, 1);
+				else shipTypeFilter.replace(ShipContainer.BM, 0);
+				
+			}
+		});
+		shipTypeList.add(monitor, g);
+		g.gridy++;
+		
+		g.gridx = 1;
+		g.gridy = 0;
+		
+		JCheckBox destroyer = new JCheckBox("Destroyer");
+		if(shipTypeFilter.get(ShipContainer.DD) == 1) destroyer.setSelected(true);
+		destroyer.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.DD, 1);
+				else shipTypeFilter.replace(ShipContainer.DD, 0);
+				
+			}
+		});
+		shipTypeList.add(destroyer, g);
+		g.gridy++;
+		
+		JCheckBox repairShip = new JCheckBox("Repair Ship");
+		if(shipTypeFilter.get(ShipContainer.AR) == 1) repairShip.setSelected(true);
+		repairShip.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.AR, 1);
+				else shipTypeFilter.replace(ShipContainer.AR, 0);
+				
+			}
+		});
+		shipTypeList.add(repairShip, g);
+		g.gridy++;
+		
+		JCheckBox aircraftCarrier = new JCheckBox("Aircraft Carrier");
+		if(shipTypeFilter.get(ShipContainer.CV) == 1) aircraftCarrier.setSelected(true);
+		aircraftCarrier.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.CV, 1);
+				else shipTypeFilter.replace(ShipContainer.CV, 0);
+				
+			}
+		});
+		shipTypeList.add(aircraftCarrier, g);
+		g.gridy++;
+		
+		JCheckBox lightAircraftCarrier = new JCheckBox("Light Aircraft Carrier");
+		if(shipTypeFilter.get(ShipContainer.CVL) == 1) lightAircraftCarrier.setSelected(true);
+		lightAircraftCarrier.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.CVL, 1);
+				else shipTypeFilter.replace(ShipContainer.CVL, 0);
+				
+			}
+		});
+		shipTypeList.add(lightAircraftCarrier, g);
+		g.gridy++;
+
+		JCheckBox submarine = new JCheckBox("Submarine");
+		if(shipTypeFilter.get(ShipContainer.SS) == 1) submarine.setSelected(true);
+		submarine.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.SS, 1);
+				else shipTypeFilter.replace(ShipContainer.SS, 0);
+				
+			}
+		});
+		shipTypeList.add(submarine, g);
+		g.gridy++;
+
+		JCheckBox submarineCarrier = new JCheckBox("Submarine Carrier");
+		if(shipTypeFilter.get(ShipContainer.AM) == 1) submarineCarrier.setSelected(true);
+		submarineCarrier.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) shipTypeFilter.replace(ShipContainer.AM, 1);
+				else shipTypeFilter.replace(ShipContainer.AM, 0);
+				
+			}
+		});
+		shipTypeList.add(submarineCarrier, g);
+		g.gridy++;
+		
+		shipTypeFilterPanel.add(shipTypeList);
+		
+		JButton okButton = new JButton("Ok");
+		okButton.setPreferredSize(new Dimension(100, 20));
+		okButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				ships.clear();
+				
+				if(shipCategoryFilter.contains("N"))
+					for (Ship ship : shipList.getShip(ShipContainer.NORMAL_SHIP))
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1) 
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
+
+									
+						
+				if(shipCategoryFilter.contains("P"))
+					for (Ship ship : shipList.getShip(ShipContainer.PRIORITY_SHIP))
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
+									
+
+				if(shipCategoryFilter.contains("C"))
+					for (Ship ship : shipList.getShip(ShipContainer.COLLAB_SHIP)) 
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
+				
+				main_scroll_panel.setViewportView(ship_select_scroll_panel(ships));
+				repaint();
+				
+				setEnabled(true);
+				
+				frame.dispose();
+				
+			}
+		});
+		
+		rightColumn.add(shipTypeFilterPanel);
+		rightColumn.add(okButton);
+		
+		mainPanel.add(leftColumn);
+		mainPanel.add(rightColumn);
+		
+		frame.add(mainPanel);
+		
+		frame.pack();
+		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		frame.setVisible(true);
+		
+		
+	}
+	
+	public void shipSelect() {
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -97,8 +535,6 @@ public class WindowsManager extends JFrame{
 		mainPanel.setPreferredSize(new Dimension(1000, 820));
 		mainPanel.setBackground(new Color(0, 0, 0, 200));
 		
-		JScrollPane main_scroll_panel = new JScrollPane();
-		
 		JPanel header = new JPanel();
 		header.setBackground(Color.DARK_GRAY);
 		header.setBorder(new EmptyBorder(10, 50, 10, 50));
@@ -120,6 +556,17 @@ public class WindowsManager extends JFrame{
 		
 		JButton filter = new JButton();
 		filter.setMaximumSize(new Dimension(40, 40));
+		filter.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+				filterWindow();
+				setEnabled(false);
+				
+			}
+		});
 		
 		JTextField searchBar = new JTextField();
 		searchBar.setMaximumSize(new Dimension(700, 40));
@@ -139,35 +586,26 @@ public class WindowsManager extends JFrame{
 
 				ships.clear();
 				
-				for (Ship ship : shipList.getShip(ShipContainer.NORMAL_SHIP)) {
-					
-					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
+				if(shipCategoryFilter.contains("N"))
+					for (Ship ship : shipList.getShip(ShipContainer.NORMAL_SHIP)) 
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+							if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase()))
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
 						
-						ships.add(ship);
-						
-					}
-					
-				}
-				
-				for (Ship ship : shipList.getShip(ShipContainer.PRIORITY_SHIP)) {
-					
-					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
-						
-						ships.add(ship);
-						
-					}
-					
-				}
+				if(shipCategoryFilter.contains("P"))
+					for (Ship ship : shipList.getShip(ShipContainer.PRIORITY_SHIP))
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+							if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase()))
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
 
-				for (Ship ship : shipList.getShip(ShipContainer.COLLAB_SHIP)) {
-					
-					if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase())){
-						
-						ships.add(ship);
-						
-					}
-					
-				}
+				if(shipCategoryFilter.contains("C"))
+					for (Ship ship : shipList.getShip(ShipContainer.COLLAB_SHIP)) 
+						if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+							if(ship.getName().toLowerCase().contains(searchBar.getText().toLowerCase()))
+								if(shipFactionFilter.contains(ship.getFaction().getName()))
+									ships.add(ship);
 				
 				main_scroll_panel.setViewportView(ship_select_scroll_panel(ships));
 				repaint();
@@ -196,9 +634,28 @@ public class WindowsManager extends JFrame{
 		
 		main_scroll_panel.setOpaque(false);
 		
-		ships.addAll(shipList.getShip(ShipContainer.NORMAL_SHIP));
-		ships.addAll(shipList.getShip(ShipContainer.PRIORITY_SHIP));
-		ships.addAll(shipList.getShip(ShipContainer.COLLAB_SHIP));
+		ships.clear();
+		
+		if(shipCategoryFilter.contains("N"))
+			for (Ship ship : shipList.getShip(ShipContainer.NORMAL_SHIP))
+				if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1) 
+						if(shipFactionFilter.contains(ship.getFaction().getName()))
+							ships.add(ship);
+
+							
+				
+		if(shipCategoryFilter.contains("P"))
+			for (Ship ship : shipList.getShip(ShipContainer.PRIORITY_SHIP))
+				if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+						if(shipFactionFilter.contains(ship.getFaction().getName()))
+							ships.add(ship);
+							
+
+		if(shipCategoryFilter.contains("C"))
+			for (Ship ship : shipList.getShip(ShipContainer.COLLAB_SHIP)) 
+				if(shipList.findType(ship) != -1 && shipTypeFilter.get(shipList.findType(ship)) == 1)
+						if(shipFactionFilter.contains(ship.getFaction().getName()))
+							ships.add(ship);
 		
 		main_scroll_panel.setViewportView(ship_select_scroll_panel(ships));
 		main_scroll_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -583,7 +1040,7 @@ public class WindowsManager extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				getContentPane().removeAll();
-				shipSelect(shipList);
+				shipSelect();
 				repaint();
 				
 			}

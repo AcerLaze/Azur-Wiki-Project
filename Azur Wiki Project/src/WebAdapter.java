@@ -29,21 +29,26 @@ public class WebAdapter {
 	final static public int SHIP_DETAIL = 1;
 	final static public int FACTION = 2;
 	
+	public static boolean allowConnection = true;
 	
 	WebAdapter(String url, int type) {
 		
 		mod = 0;
 		
-		try {
+		if(allowConnection) {
+		
+			try {
 			
-			Ship_Page = Jsoup.connect(url).get();
+				Ship_Page = Jsoup.connect(url).maxBodySize(0).get();
 			
-		} catch (Exception e) {
+			} catch (Exception e) {
 			// TODO: handle exception
 			
-			Ship_Page = null;
+				Ship_Page = null;
 			
-		}
+			}
+			
+		} else Ship_Page = null;
 		
 		if(Ship_Page == null) return;
 		
@@ -358,7 +363,6 @@ public class WebAdapter {
 			
 		} catch (Exception e) {
 			// TODO: handle exception
-			System.out.println("Error retrofit" + e.getMessage());
 			
 		}
 		

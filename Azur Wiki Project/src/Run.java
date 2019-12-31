@@ -1,6 +1,7 @@
 
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 public class Run {
@@ -25,6 +26,12 @@ public class Run {
 		DatabaseAdapter.checkDB();
 		
 		try {
+			
+			WebAdapter.allowConnection = false;
+			
+			int n = JOptionPane.showConfirmDialog(null, "Do you want to use internet connection ?", "Azur Lane Ship Wiki (ALSW)", JOptionPane.YES_NO_OPTION);
+			if(n == 0) WebAdapter.allowConnection = true;
+			else WebAdapter.allowConnection = false;
 			
 			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
 			container = webAdapter.requestShipList();
@@ -51,8 +58,9 @@ public class Run {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				window = new WindowsManager();
-				window.shipSelect(shipList);
+				
+				window = new WindowsManager(shipList);
+				window.shipSelect();
 				
 			}
 		});
