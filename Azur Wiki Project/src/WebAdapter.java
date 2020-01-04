@@ -40,6 +40,18 @@ public class WebAdapter {
 			try {
 			
 				Ship_Page = Jsoup.connect(url).maxBodySize(0).get();
+				
+				if(type == SHIP_LIST) Ship_List = Ship_Page.select("table.wikitable.sortable.jquery-tablesorter");
+				else if(type == SHIP_DETAIL) {
+						
+					Ship_Details = Ship_Page.select("table.wikitable");
+					Ship_Image = Ship_Page.select("div.adaptiveratioimg");
+						
+				} else if (type == FACTION) {
+					
+					Faction_List = Ship_Page.select("table.wikitable");
+					
+				}
 			
 			} catch (Exception e) {
 			// TODO: handle exception
@@ -50,20 +62,6 @@ public class WebAdapter {
 			
 		} else Ship_Page = null;
 		
-		if(Ship_Page == null) return;
-		
-		if(type == SHIP_LIST) Ship_List = Ship_Page.select("table.wikitable.sortable.jquery-tablesorter");
-		else if(type == SHIP_DETAIL) {
-				
-			Ship_Details = Ship_Page.select("table.wikitable");
-			Ship_Image = Ship_Page.select("div.adaptiveratioimg");
-				
-		} else if (type == FACTION) {
-			
-			Faction_List = Ship_Page.select("table.wikitable");
-			
-		}
-		
 	}
 	
 	public ShipContainer requestShipList(){
@@ -72,7 +70,7 @@ public class WebAdapter {
 		WebAdapter webAdapter;
 		List<Faction> factions;
 		
-		ShipContainer shipList = new ShipContainer();;
+		ShipContainer shipList = new ShipContainer();
 		
 		webAdapter = new WebAdapter("https://azurlane.koumakan.jp/Nations", WebAdapter.FACTION);
 		factions = webAdapter.getFactions();

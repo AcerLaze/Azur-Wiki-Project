@@ -86,7 +86,7 @@ public class Ship {
 		
 	}
 	
-	public void getData() {
+	public void getData() throws Exception{
 		
 		WebAdapter web_adapter;
 
@@ -217,6 +217,8 @@ public class Ship {
 		
 		JPanel image_panel = new JPanel();
 		
+		image_panel.setPreferredSize(new Dimension(337, 550));
+		
 		image_panel.setLayout(new BorderLayout());
 		
 		if(image.size() < 1) loadImage();
@@ -225,9 +227,7 @@ public class Ship {
 		
 		img_container.setHorizontalAlignment(JLabel.CENTER);
 		img_container.setVerticalAlignment(JLabel.CENTER);
-		
 		image_panel.add(img_container);
-		image_panel.setPreferredSize(new Dimension(337, 550));
 		
 		//image_panel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		image_panel.setBackground(getRarityColor());
@@ -263,6 +263,8 @@ public class Ship {
 	
 	public void nextImage() {
 		
+		if(image.isEmpty()) return;
+		
 		index++;
 		if(index >= image.size()) index = 0;
 		
@@ -279,6 +281,8 @@ public class Ship {
 	}
 	
 	public void prevImage() {
+		
+		if(image.isEmpty()) return;
 		
 		index--;
 		if(index < 0) index = image.size() - 1;

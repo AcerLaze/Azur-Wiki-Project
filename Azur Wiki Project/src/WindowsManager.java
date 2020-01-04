@@ -476,7 +476,7 @@ public class WindowsManager extends JFrame{
 		shipTypeFilterPanel.add(shipTypeList);
 		
 		JButton okButton = new JButton("Ok");
-		okButton.setPreferredSize(new Dimension(100, 20));
+		okButton.setPreferredSize(new Dimension(100, 150));
 		okButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -525,7 +525,7 @@ public class WindowsManager extends JFrame{
 		frame.add(mainPanel);
 		
 		frame.pack();
-		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setVisible(true);
 		
 		
@@ -588,6 +588,19 @@ public class WindowsManager extends JFrame{
 		
 		JButton filter = new JButton();
 		filter.setMaximumSize(new Dimension(40, 40));
+		
+		try {
+			
+			Image img = ImageIO.read(new File("Source/filter.png"));
+			img = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+			filter.setIcon(new ImageIcon(img));
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(" > Failed to load filter icon");
+			
+		}
+		
 		filter.addActionListener(new ActionListener() {
 			
 			@Override
@@ -728,7 +741,20 @@ public class WindowsManager extends JFrame{
 		
 		for (Ship ship : ships) {
 			
-			if(!ship.isDownloaded())ship.getData();
+			if(!ship.isDownloaded()) {
+				
+				try {
+					
+					ship.getData();
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+					
+					System.out.println(" > Failed to get " + ship.getName() + " data");
+					
+				}
+				
+			}
 			
 			JPanel shipHolder = new JPanel();
 			shipHolder.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -852,7 +878,7 @@ public class WindowsManager extends JFrame{
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(" > Failed to laod background");
 		}
 		
 	}
@@ -901,6 +927,27 @@ public class WindowsManager extends JFrame{
 		
 		next.setPreferredSize(new Dimension(50, 50));
 		prev.setPreferredSize(new Dimension(50, 50));
+		
+		try {
+			
+			Image img = ImageIO.read(new File("Source/next.png"));
+			img = img.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+			next.setIcon(new ImageIcon(img));
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		try {
+			
+			Image img = ImageIO.read(new File("Source/prev.png"));
+			img = img.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+			prev.setIcon(new ImageIcon(img));
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 		
 		next.addActionListener(new ActionListener() {
 			

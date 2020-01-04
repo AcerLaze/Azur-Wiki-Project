@@ -34,10 +34,10 @@ public class ShipContainer{
 		NormalShip = new ArrayList<Ship>();
 		PriorityShip = new ArrayList<Ship>();
 		CollabShip = new ArrayList<Ship>();
-		avg_ship_holder = new Ship[11];
-		total_ship = new Integer[11];
+		avg_ship_holder = new Ship[12];
+		total_ship = new Integer[12];
 		
-		for(int i = 0; i < 11; i++) {
+		for(int i = 0; i < 12; i++) {
 			
 			total_ship[i] = 0;
 			avg_ship_holder[i] = new Ship();
@@ -242,16 +242,43 @@ public class ShipContainer{
 		//Get All Ship Details (If you want to download it all)
 		if(type == NORMAL_SHIP) for (Ship ship : NormalShip) {
 			
-			ship.getData();
+			try {
+				
+				ship.getData();
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				
+				System.out.println(" > Failed to get " + ship.getName() + " data");
+				
+			}
 			calculateAvg();
 			
 		} else if(type == PRIORITY_SHIP) for (Ship ship : PriorityShip) {
 			
-			ship.getData();
+			try {
+				
+				ship.getData();
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				
+				System.out.println(" > Failed to get " + ship.getName() + " data");
+				
+			}
 			
 		} else if(type == COLLAB_SHIP) for (Ship ship : CollabShip) {
 			
-			ship.getData();
+			try {
+				
+				ship.getData();
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				
+				System.out.println(" > Failed to get " + ship.getName() + " data");
+				
+			}
 			calculateAvg();
 			
 		}

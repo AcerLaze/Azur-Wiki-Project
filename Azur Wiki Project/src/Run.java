@@ -1,7 +1,6 @@
 
 import java.util.Scanner;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -35,11 +34,13 @@ public class Run {
 			else WebAdapter.allowConnection = false;
 			
 			webAdapter = new WebAdapter("https://azurlane.koumakan.jp/List_of_Ships", WebAdapter.SHIP_LIST);
+			
 			container = webAdapter.requestShipList();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Something Went Wrong When Connecting To The Server. Perhaps the server is down or your connection.");
+			e.printStackTrace();
 
 		}
 		
@@ -57,7 +58,6 @@ public class Run {
 		window = new WindowsManager(shipList);
 		
 		window.startLoading();
-		
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			
